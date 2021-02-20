@@ -14,9 +14,9 @@ public class DownFileUtil {
 
     /**
      * 文件转byte数组
-     * @param file
-     * @return
-     * @throws IOException
+     * @param file 文件
+     * @return 字节数字
+     * @throws IOException io异常
      */
     public static byte[] file2ByteArray(File file) throws IOException {
         try (FileInputStream in = new FileInputStream(file);
@@ -31,6 +31,12 @@ public class DownFileUtil {
         }
     }
 
+    /**
+     * 获取响应entity
+     * @param os  OutputStream
+     * @param fileName 文件名称
+     * @return ResponseEntity
+     */
     public static ResponseEntity<byte[]> getResponseEntity(ByteArrayOutputStream os, String fileName) {
         return WebUtils.createAttachmentResponseEntity(fileName, os.toByteArray());
     }

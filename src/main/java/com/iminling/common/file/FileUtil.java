@@ -17,7 +17,12 @@ public class FileUtil {
         return FilenameUtils.getName(path);
     }
 
-    //创建文件
+    /**
+     * 创建文件
+     * @param fileName 文件名称
+     * @return 文件对象
+     * @throws IOException io异常
+     */
     public static File createFile(String fileName) throws IOException {
         Path path = Paths.get(fileName);
 
@@ -42,7 +47,10 @@ public class FileUtil {
 
     }
 
-    //获得默认的权限
+    /**
+     * 获得默认的权限
+     * @return 权限集合
+     */
     public static Set<PosixFilePermission> getRecommendPerm() {
         //using PosixFilePermission to set file permissions 777
         Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
@@ -65,7 +73,11 @@ public class FileUtil {
 
     }
 
-    //给文件设置权限
+    /**
+     * 给文件设置权限
+     * @param fileName 文件名称
+     * @return 是否设置成功
+     */
     public static boolean setFilePermission(String fileName) {
         try {
             String osName = System.getProperties().getProperty("os.name");

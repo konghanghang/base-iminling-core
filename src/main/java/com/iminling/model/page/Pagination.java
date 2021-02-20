@@ -27,7 +27,7 @@ public class Pagination<T> {
     /**
      * 分页构造函数
      *
-     * @param page
+     * @param page page接口对象
      */
     public Pagination(IPage<T> page) {
         this();

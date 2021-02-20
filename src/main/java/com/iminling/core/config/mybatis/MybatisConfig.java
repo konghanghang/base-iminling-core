@@ -12,6 +12,7 @@ public class MybatisConfig {
 
     /**
      * mybatis-plus分页插件
+     * @return PaginationInnerInterceptor
      */
     @Bean
     public PaginationInnerInterceptor paginationInterceptor() {
@@ -25,7 +26,7 @@ public class MybatisConfig {
 
     /**
      * map接收,转驼峰
-     * @return
+     * @return ConfigurationCustomizer
      */
     @Bean
     public ConfigurationCustomizer mybatisConfigurationCustomizer(){

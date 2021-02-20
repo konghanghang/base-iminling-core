@@ -8,9 +8,9 @@ public class MapUtils {
 
     /**
      * 对象转map
-     * @param obj
-     * @return
-     * @throws IllegalAccessException
+     * @param obj 对象
+     * @return map
+     * @throws IllegalAccessException 非法访问异常
      */
     public static Map<String, Object> objToMap(Object obj) throws IllegalAccessException {
         Map<String, Object> map = new LinkedHashMap<>();

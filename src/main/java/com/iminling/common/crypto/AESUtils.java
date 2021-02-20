@@ -33,8 +33,8 @@ public class AESUtils {
 
     /**
      * 加密 ECB模式 使用默认key
-     * @param content
-     * @return
+     * @param content 加密字符串
+     * @return 加密后的字符串
      */
     public static String encryptECB(String content) {
         return encryptECB(content, ECB_KEY);
@@ -44,7 +44,7 @@ public class AESUtils {
      * 加密 ECB模式
      * @param content 需要加密的内容
      * @param key  加密key
-     * @return
+     * @return 加密后的字符串
      */
     public static String encryptECB(String content, String key) {
         try {
@@ -70,8 +70,8 @@ public class AESUtils {
 
     /**
      * 解密 ECB模式 使用默认key
-     * @param content
-     * @return
+     * @param content 待解密内容
+     * @return  解密后的字符串
      */
     public static String decryptECB(String content) {
         return decryptECB(content, ECB_KEY);
@@ -81,7 +81,7 @@ public class AESUtils {
      * 解密 ECB模式
      * @param content 需要解密的内容
      * @param key  解密key
-     * @return
+     * @return 解密后的字符串
      */
     public static String decryptECB(String content, String key) {
         try {
@@ -107,8 +107,8 @@ public class AESUtils {
 
     /**
      * 生成AES ECB模式 加密key
-     * @return
-     * @throws Exception
+     * @return ecb key
+     * @throws Exception 异常
      */
     public static String generateECBKey() throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(AES_NAME);
@@ -121,10 +121,10 @@ public class AESUtils {
 
     /**
      * 加密 CBC模式
-     * @param data
-     * @param sessionKey
-     * @param iv
-     * @return
+     * @param data 数据
+     * @param sessionKey key
+     * @param iv iv
+     * @return 加密后的字符串
      */
     public static String encryptCBC(String data, String sessionKey, String iv){
         byte[] dataByte = Base64.decodeBase64(data);
@@ -171,10 +171,10 @@ public class AESUtils {
 
     /**
      * 解密 CBC模式
-     * @param encryptedData
-     * @param sessionKey
-     * @param iv
-     * @return
+     * @param encryptedData 加密后的字符串
+     * @param sessionKey key
+     * @param iv iv
+     * @return 解密后的字符串
      */
     public static String decryptCBC(String encryptedData,String sessionKey,String iv){
         //解密之前先把Base64格式的数据转成原始格式

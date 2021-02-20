@@ -14,6 +14,11 @@ import java.security.NoSuchAlgorithmException;
  */
 public class SHAUtils {
 
+    /**
+     * sha1加密
+     * @param decript 待加密字符串
+     * @return 密文
+     */
     public static String SHA1(String decript) {
         try {
             MessageDigest digest = MessageDigest
@@ -26,6 +31,11 @@ public class SHAUtils {
         return "";
     }
 
+    /**
+     * sha加密
+     * @param decript 待加密字符串
+     * @return 密文
+     */
     public static String SHA(String decript) {
         try {
             MessageDigest digest = MessageDigest
@@ -42,8 +52,7 @@ public class SHAUtils {
      * 使用 HMAC-SHA1 签名方法对对encryptText进行签名
      * @param encryptText 被签名的字符串
      * @param encryptKey  密钥
-     * @return
-     * @throws Exception
+     * @return 字节数组
      */
     public static byte[] HmacSHA1Encrypt(String encryptText, String encryptKey) {
         try {

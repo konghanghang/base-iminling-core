@@ -60,11 +60,11 @@ public class HttpClientUtils {
 
     /**
      * 构建get请求url
-     * @param host
-     * @param path
-     * @param params
-     * @return
-     * @throws UnsupportedEncodingException
+     * @param host 主机
+     * @param path 请求路径
+     * @param params 参数
+     * @return body
+     * @throws UnsupportedEncodingException 不支持的编码异常
      */
     private static String buildUrl(String host, String path, Map<String, String> params) throws UnsupportedEncodingException {
         StringBuilder sbUrl = new StringBuilder();
@@ -98,9 +98,9 @@ public class HttpClientUtils {
     }
 
     /**
-     * @desciption 发送get请求
-     * @param url
-     * @return
+     * 发送get请求
+     * @param url 请求url
+     * @return body
      */
     public static String httpGet(String url) {
         HttpGet httpGet = new HttpGet(url);
@@ -121,10 +121,10 @@ public class HttpClientUtils {
     }
 
     /**
-     * @description post请求发送,请求参数为formData
-     * @param url
-     * @param para
-     * @return
+     * post请求发送,请求参数为formData
+     * @param url 请求url
+     * @param para 请求参数
+     * @return body
      */
     public static String httpPostForm(String url, Map<String, Object> para) {
         HttpPost httpPost = new HttpPost(url);
@@ -154,21 +154,21 @@ public class HttpClientUtils {
 
 
     /**
-     * @description 发送post请求,请求参数为json字符串
-     * @param url
-     * @param postData
-     * @return
+     * 发送post请求,请求参数为json字符串
+     * @param url 请求url
+     * @param postData 请求参数
+     * @return body
      */
     public static String httpPostJson(String url, String postData) {
         return httpPost(url, postData, "application/json");
     }
 
     /**
-     * @description 发送post请求,请求参数为json字符串
+     * 发送post请求,请求参数为json字符串
      * @param url 请求的url
      * @param postData 请求的数据,json字符串
      * @param contentType 可以取值application/json,text/xml等
-     * @return
+     * @return body
      */
     public static String httpPost(String url, String postData, String contentType) {
         HttpPost httpPost = new HttpPost(url);
@@ -195,11 +195,12 @@ public class HttpClientUtils {
     }
 
     /**
-     * @description 发送post请求,请求参数为json字符串
+     * 发送post请求,请求参数为json字符串
+     * @param client 请求客户端
      * @param url 请求的url
      * @param postData 请求的数据,json字符串
      * @param contentType 可以取值application/json,text/xml等
-     * @return
+     * @return body
      */
     public static String httpPost(CloseableHttpClient client, String url, String postData, String contentType) {
         HttpPost httpPost = new HttpPost(url);
@@ -233,9 +234,10 @@ public class HttpClientUtils {
     }
 
     /**
-     * @description 发送post请求， 获取返回的inputStream
+     * 发送post请求， 获取返回的inputStream
      * @param url 请求的url
-     * @return
+     * @param postData 请求参数
+     * @return body
      */
     public static byte[] httpPostGetBytes(String url, String postData) {
         HttpPost httpPost = new HttpPost(url);
@@ -273,7 +275,7 @@ public class HttpClientUtils {
 
     /**
      * 创建SSLClient,信任所有证书
-     * @return
+     * @return {@link CloseableHttpClient}
      */
     public static CloseableHttpClient createSSLClientTruestAllCert(){
         try {
@@ -299,9 +301,9 @@ public class HttpClientUtils {
     }
 
     /**
-     * @description 创建SSLClient,需要加载证书
-     * @param certificatePath
-     * @param certificatePassword
+     * 创建SSLClient,需要加载证书
+     * @param certificatePath 证书路径
+     * @param certificatePassword 证书密码
      * @return CloseableHttpClient
      */
     public static CloseableHttpClient createSSLClient(String certificatePath, String certificatePassword){
@@ -309,7 +311,7 @@ public class HttpClientUtils {
     }
 
     /**
-     * @description 创建SSLClient,需要加载证书
+     * 创建SSLClient,需要加载证书
      * @param certificatePath 证书存放的路径
      * @param certificatePassword 证书的密码
      * @param keyStoreType keystore的类型(PKCS12等)
@@ -357,10 +359,10 @@ public class HttpClientUtils {
     }
 
     /**
-     * @description 统一处理httpclient请求返回的数据,转为JSONObject
-     * @param response
-     * @return JSONObject
-     * @throws IOException
+     * 统一处理httpclient请求返回的数据,转为JSONObject
+     * @param response 请求响应
+     * @return body
+     * @throws IOException io异常
      */
     public static String responseHandle(CloseableHttpResponse response) throws IOException {
         String result = null;
@@ -383,6 +385,8 @@ public class HttpClientUtils {
      * MultipartEntityBuilder 默认contentType为 multipart_form_data
      * @param url 上传地址
      * @param path 要上传的文件路径
+     * @param token token
+     * @return body
      */
     public static String postFile(String url, String path,String token) {
         try(CloseableHttpClient httpclient = HttpClients.createDefault()) {
@@ -413,6 +417,8 @@ public class HttpClientUtils {
      * MultipartEntityBuilder 默认contentType为 multipart_form_data
      * @param url 上传地址
      * @param content 要上传内容
+     * @param token token
+     * @return body
      */
     public static String postBytes(String url, byte[] content, String token) {
         try(CloseableHttpClient httpclient = HttpClients.createDefault()) {
@@ -439,10 +445,10 @@ public class HttpClientUtils {
 
     /**
      * 七牛云 post Base64File
-     * @param url
-     * @param base64File
-     * @param token
-     * @return
+     * @param url 请求url
+     * @param base64File base64格式的文件
+     * @param token token
+     * @return code
      */
     public static String postBase64File(String url, String base64File,String token) {
         try(CloseableHttpClient httpclient = HttpClients.createDefault()) {

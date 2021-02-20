@@ -25,8 +25,8 @@ public class RSAUtils {
 
     /**
      * 随机生成密钥对
-     * @param keyLength
-     * @return
+     * @param keyLength key长度
+     * @return key对象
      */
     public static KeyPair genKeyPair(int keyLength) {
         // KeyPairGenerator类用于生成公钥和私钥对，基于RSA算法生成对象
@@ -44,8 +44,8 @@ public class RSAUtils {
 
     /**
      * RSA公钥加密
-     * @param str
-     * @return
+     * @param str 待加密字符串
+     * @return 加密后字符串
      */
     public static String encrypt(String str) {
         return encrypt(str, DEFAULT_PUBLIC_KEY);
@@ -82,8 +82,8 @@ public class RSAUtils {
 
     /**
      * RSA私钥解密
-     * @param str
-     * @return
+     * @param str 待解密字符串
+     * @return 明文
      */
     public static String decrypt(String str){
         return decrypt(str, DEFAULT_PRIVATE_KEY);
@@ -118,8 +118,8 @@ public class RSAUtils {
 
     /**
      * 返回公钥对象
-     * @param publicKey
-     * @return
+     * @param publicKey publickey
+     * @return pulickey对象
      */
     private static PublicKey getPublicKey(String publicKey) {
         byte[] bytes = Base64.decodeBase64(publicKey.getBytes(StandardCharsets.UTF_8));
@@ -136,8 +136,8 @@ public class RSAUtils {
 
     /**
      * 返回私钥对象
-     * @param privateKey
-     * @return
+     * @param privateKey 私钥
+     * @return 私钥对象
      */
     private static PrivateKey getPrivateKey(String privateKey) {
         byte[] bytes = Base64.decodeBase64(privateKey.getBytes(StandardCharsets.UTF_8));

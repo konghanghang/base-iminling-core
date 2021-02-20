@@ -8,10 +8,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * 
- * </p>
- *
  * @author konghang
  * @since 2020-07-08
  */

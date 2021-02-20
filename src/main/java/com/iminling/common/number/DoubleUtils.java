@@ -10,8 +10,8 @@ public class DoubleUtils {
 
     /**
      * double 相加
-     * @param doubles
-     * @return
+     * @param doubles double可变参数
+     * @return 和
      */
     public static double sum(Double... doubles){
         BigDecimal rs = new BigDecimal("0");
@@ -24,8 +24,8 @@ public class DoubleUtils {
 
     /**
      * double 相减
-     * @param doubles
-     * @return
+     * @param doubles double可变参数
+     * @return 差
      */
     public static double sub(Double... doubles){
         BigDecimal first = null;
@@ -41,8 +41,8 @@ public class DoubleUtils {
 
     /**
      * double 乘法
-     * @param doubles
-     * @return
+     * @param doubles double可变参数
+     * @return 积
      */
     public static double mul(Double... doubles){
         BigDecimal rs = new BigDecimal("1");
@@ -55,9 +55,9 @@ public class DoubleUtils {
 
     /**
      * double 除法
-     * @param d1
-     * @param d2
-     * @return
+     * @param d1 被除数
+     * @param d2 除数
+     * @return 商
      */
     public static double div(double d1,double d2){
         return DoubleUtils.div(d1,d2,2);
@@ -66,10 +66,10 @@ public class DoubleUtils {
 
     /**
      * double 除法
-     * @param d1
-     * @param d2
+     * @param d1 被除数
+     * @param d2 除数
      * @param scale 四舍五入 小数点位数
-     * @return
+     * @return 商
      */
     public static double div(double d1,double d2,int scale){
         //  当然在此之前，你要判断分母是否为0，
@@ -81,8 +81,8 @@ public class DoubleUtils {
 
     /**
      * double 转 string 去掉后面锝0
-     * @param i
-     * @return
+     * @param i 待处理double数
+     * @return 转换后的字符串
      */
     public static String getString(double i){
         String s = String.valueOf(i);
@@ -97,8 +97,8 @@ public class DoubleUtils {
 
     /**
      * 数字转换为千位符
-     * @param number
-     * @return
+     * @param number 待处理的数字
+     * @return 处理后的字符串
      */
     public static String numberToBits(String number){
         String begin="",end="";

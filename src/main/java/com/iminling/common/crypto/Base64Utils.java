@@ -18,14 +18,19 @@ public class Base64Utils {
      * 在base64解码的过程中, 要清除掉结尾处的等号,
      * 然后再反查”base64索引与字母对照表”,转换成原始的字节序列.
      * 那么,去掉尾部的等号,并没有丢失原始信息,但结构变得不规范.
-     * @param data
-     * @return
+     * @param data 加密字符串
+     * @return 加密后的字符串
      */
     public static String safeUrlEncode(String data){
         byte[] result = data.getBytes(StandardCharsets.UTF_8);
         return safeUrlEncode(result);
     }
 
+    /**
+     * 安全加密
+     * @param data 字节数组
+     * @return 密文
+     */
     public static String safeUrlEncode(byte[] data){
         String base64 = Base64.encodeBase64String(data);
         String urlSafeStr = base64.replace('+', '-');
@@ -34,6 +39,11 @@ public class Base64Utils {
         return urlSafeStr;
     }
 
+    /**
+     * 安全解密
+     * @param safeBase64Str 密文
+     * @return 明文
+     */
     public static String safeUrlDecode(final String safeBase64Str) {
         String base64Str = safeBase64Str.replace('-', '+');
         base64Str = base64Str.replace('_', '/');
@@ -45,6 +55,11 @@ public class Base64Utils {
         return new String(str, StandardCharsets.UTF_8);
     }
 
+    /**
+     * base64文件转字节数组
+     * @param base64Data base64文件
+     * @return 字节数组
+     */
     public static byte[] base64FileToByte(String base64Data) {
         if (base64Data != null && (!base64Data.equals("undefined"))) {
             String base64Encode = base64Data.substring(base64Data.indexOf(',') + 1);
@@ -60,8 +75,8 @@ public class Base64Utils {
 
     /**
      * base64解码
-     * @param s
-     * @return
+     * @param s 加密字符串
+     * @return 加密后的字符串
      */
     public static String encode(String s) {
         if (StringUtils.isBlank(s)) {
@@ -72,8 +87,8 @@ public class Base64Utils {
 
     /**
      * base64解码
-     * @param s
-     * @return
+     * @param s 待解密字符串
+     * @return 解密后的字符串
      */
     public static String decode(String s) {
         if (StringUtils.isBlank(s)){

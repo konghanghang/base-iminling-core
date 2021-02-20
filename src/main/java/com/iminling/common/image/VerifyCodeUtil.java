@@ -6,7 +6,7 @@ import java.util.Random;
 
 /**
  * 验证码生成器
- * @create 2017/9/13
+ * @since 2017/9/13
  * @author yslao@outlook.com
  */
 public class VerifyCodeUtil {

@@ -58,7 +58,8 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
     }
 
     /**
-     * 错误构造器 (Constructor) 传递配置属性：server.xx -> server.error.xx
+     * 错误构造器 (Constructor) 传递配置属性：server.xx - server.error.xx
+     * @param serverProperties 配置文件
      */
     public ErrorInfoBuilder(ServerProperties serverProperties) {
         this.errorProperties = serverProperties.getError();
@@ -66,6 +67,9 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
 
     /**
      * 构建错误信息.
+     * @param request request
+     * @param response response
+     * @return ResultModel
      */
     public ResultModel getErrorInfo(HttpServletRequest request, HttpServletResponse response) {
         return getErrorInfo(request, response, getError(request));
@@ -73,6 +77,10 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
 
     /**
      * 构建错误信息.
+     * @param request request
+     * @param response response
+     * @param error 错误对象
+     * @return ResultModel
      */
     public ResultModel getErrorInfo(HttpServletRequest request, HttpServletResponse response, Throwable error) {
         StringBuilder sb = new StringBuilder();
@@ -96,10 +104,10 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
 
     /**
      * 获取错误.(Error/Exception)
-     *
+     * {@link org.springframework.boot.web.servlet.error.DefaultErrorAttributes addErrorDetails}
      * 获取方式：通过Request对象获取(Key="javax.servlet.error.exception").
-     *
-     * @see org.springframework.boot.web.servlet.error.DefaultErrorAttributes addErrorDetails
+     * @param request request
+     * @return  Throwable
      */
     public Throwable getError(HttpServletRequest request) {
         //根据HandlerExceptionResolver接口方法来获取错误.
@@ -128,7 +136,9 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
     /**
      * 获取通信状态(HttpStatus)
      *
-     * @see org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController getStatus
+     * {@link org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController getStatus}
+     * @param request request
+     * @return HttpStatus
      */
     public HttpStatus getHttpStatus(HttpServletRequest request) {
         Integer statusCode = (Integer) request.getAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE);
@@ -141,8 +151,10 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
 
     /**
      * 获取堆栈轨迹(StackTrace)
-     *
-     * @see org.springframework.boot.web.servlet.error.DefaultErrorAttributes# addStackTrace
+     * 查看 org.springframework.boot.web.servlet.error.DefaultErrorAttributes# addStackTrace
+     * @param error 异常
+     * @param flag  标识
+     * @return 字符串
      */
     public String getStackTraceInfo(Throwable error, boolean flag) {
         if (!flag) {
@@ -156,8 +168,9 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
 
     /**
      * 判断是否包含堆栈轨迹.(isIncludeStackTrace)
-     *
-     * @see org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController isIncludeStackTrace
+     * @param request request
+     * {@link org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController isIncludeStackTrace}
+     * @return boolean
      */
     public boolean isIncludeStackTrace(HttpServletRequest request) {
 
@@ -186,8 +199,12 @@ public class ErrorInfoBuilder implements HandlerExceptionResolver, Ordered {
 
     /**
      * 保存错误/异常.
-     *
-     * @see org.springframework.web.servlet.DispatcherServlet processHandlerException 进行选举HandlerExceptionResolver
+     * @param request request
+     * @param response response
+     * @param handler handler
+     * @param ex 异常
+     * {@link org.springframework.web.servlet.DispatcherServlet processHandlerException} 进行选举HandlerExceptionResolver
+     * @return ModelAndView
      */
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {

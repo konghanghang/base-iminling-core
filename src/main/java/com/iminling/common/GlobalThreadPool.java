@@ -24,6 +24,9 @@ public class GlobalThreadPool {
         init();
     }
 
+    /**
+     * 初始化方法
+     */
     private static void init() {
         if (null != executor){
             executor.shutdownNow();
@@ -37,10 +40,18 @@ public class GlobalThreadPool {
         LOGGER.info("GlobalThreadPool init, globalThreadPoolCoreSize:{}, globalThreadPoolMaxSize:{}", globalThreadPoolCoreSize, globalThreadPoolMaxSize);
     }
 
+    /**
+     * 获取Executor服务
+     * @return Executor服务
+     */
     public static ExecutorService getExecutor(){
         return executor;
     }
 
+    /**
+     * 执行任务
+     * @param runnable 任务
+     */
     public static void execute(Runnable runnable){
         try {
             executor.execute(runnable);
@@ -49,14 +60,28 @@ public class GlobalThreadPool {
         }
     }
 
+    /**
+     * 提交带返回结果的任务
+     * @param task 任务
+     * @param <T> 泛型
+     * @return 执行结果
+     */
     public static <T> Future<T> submit(Callable<T> task){
         return executor.submit(task);
     }
 
+    /**
+     * 提交带返回结果的任务
+     * @param runnable 任务
+     * @return 执行结果
+     */
     public static Future<?> submit(Runnable runnable){
         return executor.submit(runnable);
     }
 
+    /**
+     * 关闭连接
+     */
     public static synchronized void shutDown(){
         if (executor != null){
             executor.shutdown();

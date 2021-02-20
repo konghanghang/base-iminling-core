@@ -18,7 +18,7 @@ public class DateUtils {
 
     /**
      * 返回unix时间戳 (1970年至今的秒数)
-     * @return
+     * @return 毫秒数字
      */
     public static Long getUnixStamp(){
         return System.currentTimeMillis() /1000;
@@ -36,13 +36,19 @@ public class DateUtils {
 
     /**
      * 时间戳转化为时间格式
-     * @param timeStamp
-     * @return
+     * @param timeStamp 纳秒数字
+     * @return yyyy-MM-dd
      */
     public static String timeStampToStr(long timeStamp) {
         return timeStampToStr(timeStamp,"yyyy-MM-dd");
     }
 
+    /**
+     * 时间戳转对应格式
+     * @param timeStamp 时间戳
+     * @param format 时间格式
+     * @return 对应时间格式
+     */
     public static String timeStampToStr(long timeStamp,String format){
         Instant instant = Instant.ofEpochSecond(timeStamp);
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
@@ -52,7 +58,7 @@ public class DateUtils {
     /**
      * 得到时间  HH:mm:ss
      * @param timeStamp   时间戳
-     * @return
+     * @return HH:mm:ss
      */
     public static String getTime(long timeStamp) {
         Instant instant = Instant.ofEpochSecond(timeStamp);
@@ -64,8 +70,8 @@ public class DateUtils {
     /**
      * 将一个时间戳转换成提示性时间字符串，如刚刚，1秒前
      *
-     * @param timeStamp
-     * @return
+     * @param timeStamp 毫秒数字
+     * @return {@link String}
      */
     public static String convertTimeToFormat(long timeStamp) {
         long curTime = getUnixStamp();
@@ -90,7 +96,7 @@ public class DateUtils {
 
     /**
      * 获取当天00:00:00时间戳
-     * @return
+     * @return {@link Long}
      */
     public static Long getDayStartTime() {
         LocalDateTime localDateTime = LocalDateTime.now()
@@ -102,9 +108,9 @@ public class DateUtils {
 
     /**
      * 计算两个时间戳之间相隔的天数
-     * @param begin
-     * @param end
-     * @return
+     * @param begin 开始时间 纳秒
+     * @param end 结束时间 纳秒
+     * @return 相差天数
      */
     public static int getIntervalDays(Long begin, Long end){
         LocalDateTime beginDate = LocalDateTime.ofInstant(Instant.ofEpochSecond(begin), ZoneId.systemDefault());

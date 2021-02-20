@@ -117,7 +117,7 @@ public class ImageUtils {
 
     /**
      * 上传通过base64编码后文件数据
-     * @param base64EncodeFileData
+     * @param base64EncodeFileData base64字符串
      * @return {@link String}
      */
     public static String uploadImage(String base64EncodeFileData) {
@@ -129,7 +129,7 @@ public class ImageUtils {
      * MultipartFile myFile = uploadVO.getFile();
      * ImageUtils.uploadImage(myFile.getBytes());
      * 使用spring mvc自带的MultipartFile
-     * @param imageByte
+     * @param imageByte 图片字节数组
      * @return {@link String}
      */
     public static String uploadImage(byte[] imageByte) {
@@ -150,9 +150,9 @@ public class ImageUtils {
 
     /**
      * 上传文件.
-     * @param image
-     * @param resUrlPath
-     * @return
+     * @param image 图片buffer
+     * @param resUrlPath url
+     * @return {@link String}
      */
     public static String uploadImage(BufferedImage image, String resUrlPath) {
         /*
@@ -196,9 +196,9 @@ public class ImageUtils {
 
     /**
      * 通过远程图片url读取图片为bufferedImage
-     * @param destUrl
-     * @return
-     * @throws Exception
+     * @param destUrl 目标地址
+     * @return {@link BufferedImage}
+     * @throws Exception 异常
      */
     public static BufferedImage loadRemoteImage(String destUrl) throws Exception {
         byte[] imageByte = loadRemoteBytes(destUrl);
@@ -206,6 +206,12 @@ public class ImageUtils {
         return image;
     }
 
+    /**
+     * 加载远程图片
+     * @param destUrl 图片地址
+     * @return 字节数组
+     * @throws Exception 异常
+     */
     public static byte[] loadRemoteBytes(String destUrl) throws Exception {
         ///new一个URL对象
         URL url = new URL(destUrl);
@@ -221,6 +227,12 @@ public class ImageUtils {
         return readInputStream(inStream);
     }
 
+    /**
+     * 读取inputstream
+     * @param inStream stream
+     * @return 字节数组
+     * @throws Exception 异常
+     */
     public static byte[] readInputStream(InputStream inStream) throws Exception {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
         //创建一个Buffer字符串
@@ -238,7 +250,12 @@ public class ImageUtils {
         return outStream.toByteArray();
     }
 
-    //上传文件
+    /**
+     * 上传文件
+     * @param multipartFile springMvc文件类型
+     * @param realRootPath 上传路径
+     * @return 路径
+     */
     public static String uploadFile(MultipartFile multipartFile, String realRootPath) {
         String fileName = multipartFile.getOriginalFilename();
         String uploadFileName = getFileName(fileName);
@@ -253,6 +270,12 @@ public class ImageUtils {
         }
     }
 
+    /**
+     * 上传文件
+     * @param multipartRequest 请求
+     * @param fileName 文件名称
+     * @return 上传路径
+     */
     public static String uploadFile(MultipartHttpServletRequest multipartRequest, String fileName) {
         MultipartFile multipartFile = multipartRequest.getFile(fileName);
         String fileResult = null;
@@ -267,9 +290,9 @@ public class ImageUtils {
 
     /**
      * 保存byte[]到文件
-     * @param byteImages
-     * @param fileName
-     * @return
+     * @param byteImages 文件字节数组
+     * @param fileName 文件名称
+     * @return 是否保存成功
      */
     public static boolean saveToFile(byte[] byteImages, String fileName) {
         try {
@@ -290,8 +313,8 @@ public class ImageUtils {
 
     /**
      * 获取文件大小
-     * @param base64EncodeFileData
-     * @return
+     * @param base64EncodeFileData base64文件字符串
+     * @return 文件大小
      */
     public static Integer getImageSize(String base64EncodeFileData) {
         try {

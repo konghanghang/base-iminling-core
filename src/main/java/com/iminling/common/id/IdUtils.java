@@ -18,8 +18,8 @@ public class IdUtils {
 
     /**
      * 加密id
-     * @param id
-     * @return
+     * @param id 数字id
+     * @return 加密后的字符串
      */
     public static String encodeId(long id){
         return hashids.encode(id);
@@ -27,8 +27,8 @@ public class IdUtils {
 
     /**
      * 解密id
-     * @param hashId
-     * @return
+     * @param hashId 加密后的字符串
+     * @return 数字id
      */
     public static Long decodeId(String hashId){
         long[] decode = hashids.decode(hashId);

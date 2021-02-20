@@ -24,11 +24,11 @@ public class CacheUtils {
 
     /**
      * 获取数据
-     * @param key
-     * @param load
+     * @param key key
+     * @param load 加载方法
      * @param expire 毫秒
-     * @param <T>
-     * @return
+     * @param <T> 泛型
+     * @return T
      */
     public static <T> T getData(String key, CacheLoad<T> load, int expire){
         T data = getData(key);
@@ -43,9 +43,9 @@ public class CacheUtils {
 
     /**
      * 获取数据
-     * @param key
-     * @param <T>
-     * @return
+     * @param key key
+     * @param <T> t
+     * @return T
      */
     public static <T> T getData(String key){
         CacheData<T> data = CACHE_DATA.get(key);
@@ -60,7 +60,7 @@ public class CacheUtils {
      * @param key key
      * @param data 数据
      * @param expire 过期时间，毫秒
-     * @param <T>
+     * @param <T> 泛型
      */
     public static <T> void setData(String key, T data, int expire){
         CACHE_DATA.put(key, new CacheData(data,expire));

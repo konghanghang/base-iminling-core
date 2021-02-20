@@ -16,7 +16,9 @@ public class MD5Utils {
     private MD5Utils(){}
 
     /***
-      * MD5加码 生成32位md5码
+     * MD5加码 生成32位md5码
+     * @param inStr 待散列字符串
+     * @return  散列值
      */
     public static String string2MD5(String inStr) {
         MessageDigest md5 = null;
@@ -46,6 +48,8 @@ public class MD5Utils {
 
     /**
      * 加密解密算法 执行一次加密，两次解密
+     * @param inStr 待散列字符串
+     * @return 散列值
      */
     public static String convertMD5(String inStr) {
 
@@ -62,10 +66,9 @@ public class MD5Utils {
      * 判断输入的密码和数据库中保存的MD5密码是否一致
      * @param inputPassword 输入的密码
      * @param md5DB 数据库保存的密码
-     * @return
+     * @return 是否匹配
      */
     public static boolean passwordIsTrue(String inputPassword,String md5DB) {
-
         String md5 = string2MD5(inputPassword);
         return md5DB.equals(md5);
     }

@@ -27,8 +27,8 @@ public class JsonUtil {
     /**
      * 判断 对象是否为null
      * https://blog.csdn.net/qq_35566813/article/details/90914062
-     * @param object
-     * @return
+     * @param object 对象
+     * @return 是否为null
      */
     public static boolean objIsNull(Object object) {
         if (object == null) {
@@ -70,9 +70,9 @@ public class JsonUtil {
 
     /**
      * 对象转string
-     * @param obj
-     * @param <T>
-     * @return
+     * @param obj 对象
+     * @param <T> 泛型
+     * @return 字符串
      */
     public static <T> String obj2Str(T obj){
         if(objIsNull(obj)){
@@ -88,9 +88,9 @@ public class JsonUtil {
 
     /**
      * 对象转string 格式化输出
-     * @param obj
-     * @param <T>
-     * @return
+     * @param obj 对象
+     * @param <T> 泛型
+     * @return 字符串
      */
     public static <T> String obj2StrPretty(T obj){
         if(obj == null){
@@ -106,10 +106,10 @@ public class JsonUtil {
 
     /**
      * 字符串转对象
-     * @param str
-     * @param clazz
-     * @param <T>
-     * @return
+     * @param str 字符串
+     * @param clazz 对象
+     * @param <T> 泛型
+     * @return 对象
      */
     public static <T> T str2Obj(String str, Class<T> clazz){
         if(StringUtils.isEmpty(str) || clazz == null){
@@ -125,11 +125,11 @@ public class JsonUtil {
 
     /**
      * 字符串转List对象
-     * @param str
-     * @param collectionClass
-     * @param elementClasses
-     * @param <T>
-     * @return
+     * @param str json字符串
+     * @param collectionClass 集合类
+     * @param elementClasses 集合元素类
+     * @param <T> 泛型
+     * @return 集合对象
      */
     public static <T> T str2Obj(String str, Class<?> collectionClass, Class<?>... elementClasses){
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClass,elementClasses);
@@ -143,10 +143,10 @@ public class JsonUtil {
 
     /**
      * 把一个对象转成另一个对象
-     * @param pojo
-     * @param target
-     * @param <T>
-     * @return
+     * @param pojo 对象
+     * @param target 目标对象
+     * @param <T> 泛型
+     * @return 目标对象
      */
     public static <T> T convert(Object pojo, Class<T> target) {
         if (Objects.isNull(pojo)) {
@@ -157,11 +157,11 @@ public class JsonUtil {
 
     /**
      * 把数组对象转成另一个类型的数组对象
-     * @param pojo
-     * @param collectionClass
-     * @param elementClass
-     * @param <T>
-     * @return
+     * @param pojo  对象
+     * @param collectionClass 集合类
+     * @param elementClass 集合元素类
+     * @param <T> 泛型
+     * @return 集合对象
      */
     public static <T> T convert(Object pojo, Class<?> collectionClass, Class<?>... elementClass) {
         if (Objects.isNull(pojo)) {

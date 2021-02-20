@@ -58,9 +58,9 @@ public class XmlUtils {
 
     /**
      * 将对象数据转换为xml数据
-     * @param object
-     * @param clazz
-     * @return
+     * @param object 对象
+     * @param clazz 类
+     * @return 字符串
      */
     public static String object2Xml(Object object, Class<?> clazz) {
         xstream.alias("xml", clazz);
@@ -69,9 +69,9 @@ public class XmlUtils {
 
     /**
      * xml转map对象
-     * @param xmlBuffer
-     * @return
-     * @throws DocumentException
+     * @param xmlBuffer StringBuffer
+     * @return baseMap
+     * @throws DocumentException 文档异常
      */
     public static BaseMap xml2Map(StringBuffer xmlBuffer) throws DocumentException {
         return xml2Map(new String(xmlBuffer.toString().getBytes(StandardCharsets.UTF_8),
@@ -80,9 +80,9 @@ public class XmlUtils {
 
     /**
      * xml字符串转map对象
-     * @param xml
-     * @return
-     * @throws DocumentException
+     * @param xml xml字符串
+     * @return baseMap
+     * @throws DocumentException 文档异常
      */
     public static BaseMap xml2Map(String xml) throws DocumentException {
         Document document = DocumentHelper.parseText(xml);
@@ -91,8 +91,8 @@ public class XmlUtils {
 
     /**
      * document对象转map对象
-     * @param document
-     * @return
+     * @param document document
+     * @return basemap
      */
     public static BaseMap xml2Map(Document document) {
         BaseMap jsonObject = new BaseMap();
@@ -107,9 +107,9 @@ public class XmlUtils {
     /**
      * 流转map
      * @param inputStream InputStream inputStream = request.getInputStream();
-     * @return
-     * @throws IOException
-     * @throws DocumentException
+     * @return basemap
+     * @throws IOException io异常
+     * @throws DocumentException 文档异常
      */
     public static BaseMap xml2Map(InputStream inputStream) throws IOException, DocumentException {
         BaseMap jsonObject = new BaseMap();
@@ -126,10 +126,8 @@ public class XmlUtils {
 
     /**
      * map转xml
-     * @param map
-     * @return
-     * @throws IOException
-     * @throws DocumentException
+     * @param map map
+     * @return 字符串
      */
     public static String map2Xml(Map<String, Object> map) {
         StringBuilder sb = new StringBuilder();
