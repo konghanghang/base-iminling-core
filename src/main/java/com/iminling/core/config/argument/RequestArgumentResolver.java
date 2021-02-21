@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.*;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -21,8 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * 自定义参数处理器
+ */
 public class RequestArgumentResolver implements HandlerMethodArgumentResolver {
 
     public static final String REQUEST_DATA_KEY = RequestArgumentResolver.class.getName() + ".requestData";
@@ -42,10 +47,10 @@ public class RequestArgumentResolver implements HandlerMethodArgumentResolver {
             return false;
         }
         EnableResolve enableResolve = parameter.getMethodAnnotation(EnableResolve.class);
-        if (enableResolve == null) {
+        if (Objects.isNull(enableResolve)) {
             enableResolve = parameter.getContainingClass().getAnnotation(EnableResolve.class);
         }
-        if (enableResolve == null) {
+        if (Objects.isNull(enableResolve)) {
             return false;
         }
         EnableResolve.ResolveStrategy value = enableResolve.value();
@@ -56,6 +61,11 @@ public class RequestArgumentResolver implements HandlerMethodArgumentResolver {
         Class<?> parameterType = parameter.getParameterType();
         if (HttpServletResponse.class.isAssignableFrom(parameterType)
                 || HttpServletRequest.class.isAssignableFrom(parameterType)) {
+            return false;
+        }
+        // 特殊处理@PathVariable注解
+        PathVariable pathVariable = parameter.getParameterAnnotation(PathVariable.class);
+        if (Objects.nonNull(pathVariable)) {
             return false;
         }
         RequestDataWrapper requestDataWrapper = (RequestDataWrapper) request.getAttribute(REQUEST_DATA_KEY);
