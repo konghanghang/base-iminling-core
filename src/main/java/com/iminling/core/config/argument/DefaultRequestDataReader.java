@@ -1,16 +1,13 @@
 package com.iminling.core.config.argument;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.validation.constraints.NotNull;
@@ -22,7 +19,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-@Configuration
 public class DefaultRequestDataReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRequestDataReader.class);
@@ -30,10 +26,8 @@ public class DefaultRequestDataReader {
 
     private final ObjectMapper objectMapper;
 
-    public DefaultRequestDataReader() {
-        MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        this.objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
-        this.objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+    public DefaultRequestDataReader(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     public boolean canRead(@NotNull HttpInputMessage message) {
@@ -92,6 +86,6 @@ public class DefaultRequestDataReader {
     }
 
     public List<MediaType> getSupportedMediaTypes() {
-        return Arrays.asList(MediaType.APPLICATION_JSON_UTF8, MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN);
+        return Arrays.asList(MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN);
     }
 }

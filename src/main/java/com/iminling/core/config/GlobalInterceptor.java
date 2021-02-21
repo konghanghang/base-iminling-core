@@ -5,6 +5,7 @@ import com.iminling.core.config.argument.DefaultRequestDataReader;
 import com.iminling.core.config.argument.RequestArgumentResolver;
 import com.iminling.core.config.argument.RequestDataWrapper;
 import com.iminling.core.filter.Filter;
+import com.iminling.core.service.ILogService;
 import com.iminling.core.util.ResponseWriter;
 import com.iminling.core.util.ThreadContext;
 import com.iminling.model.core.ClientInfo;
@@ -47,9 +48,13 @@ public class GlobalInterceptor implements HandlerInterceptor {
 
     private final DefaultRequestDataReader defaultRequestDataReader;
     private final List<Filter> filters;
+    private final List<ILogService> logServices;
 
-    public GlobalInterceptor(List<Filter> filters, DefaultRequestDataReader defaultRequestDataReader) {
+    public GlobalInterceptor(List<Filter> filters,
+                             List<ILogService> logServices,
+                             DefaultRequestDataReader defaultRequestDataReader) {
         this.filters = filters;
+        this.logServices = logServices;
         this.defaultRequestDataReader = defaultRequestDataReader;
     }
 
@@ -63,6 +68,8 @@ public class GlobalInterceptor implements HandlerInterceptor {
             return true;
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
+        initClientInfo(request);
+        initLogRecord(request, handlerMethod);
         ServletServerHttpRequest inputMessage = new ServletServerHttpRequest(request);
         RequestDataWrapper requestDataWrapper;
         if (defaultRequestDataReader.canRead(inputMessage)) {
@@ -107,6 +114,10 @@ public class GlobalInterceptor implements HandlerInterceptor {
         ThreadContext.clear();
     }
 
+    /**
+     * 初始化ClientInfo
+     * @param request request
+     */
     private void initClientInfo(HttpServletRequest request) {
         ClientInfo clientInfo = new ClientInfo();
         clientInfo.setRequestIp(getRemoteIpAddr(request));
@@ -117,6 +128,11 @@ public class GlobalInterceptor implements HandlerInterceptor {
         ThreadContext.setClientInfo(clientInfo);
     }
 
+    /**
+     * 初始化logRecord
+     * @param request request
+     * @param handlerMethod handlerMethod
+     */
     private void initLogRecord(HttpServletRequest request, HandlerMethod handlerMethod) {
         LogRecord logRecord = new LogRecord();
         logRecord.setRequestTime(System.currentTimeMillis());
@@ -129,10 +145,20 @@ public class GlobalInterceptor implements HandlerInterceptor {
         ThreadContext.setLogRecord(logRecord);
     }
 
+    /**
+     * 获取token
+     * @param request 请求
+     * @return token
+     */
     private String getToken(HttpServletRequest request) {
         return request.getHeader(AUTHORIZATION);
     }
 
+    /**
+     * 获取path
+     * @param request 请求
+     * @return path
+     */
     private String getPath(HttpServletRequest request) {
         String path = request.getHeader("path");
         if (StringUtils.isNotEmpty(path)) {
@@ -144,6 +170,11 @@ public class GlobalInterceptor implements HandlerInterceptor {
         return path;
     }
 
+    /**
+     * 获取真实ip
+     * @param request 请求
+     * @return 真实ip
+     */
     private String getRemoteIpAddr(HttpServletRequest request) {
         String unknown = "unknown";
         String remoteIpAddr = unknown;
@@ -170,11 +201,16 @@ public class GlobalInterceptor implements HandlerInterceptor {
         return remoteIpAddr;
     }
 
+    /**
+     * 保存日志
+     */
     private void writeLog() {
         LogRecord logRecord = ThreadContext.getLogRecord();
         if (StringUtils.isNotEmpty(logRecord.getDescription())) {
-            executorService.execute(() -> {
-                // send
+            logServices.stream().forEach(log -> {
+                executorService.execute(() -> {
+                    log.saveLog(logRecord);
+                });
             });
         }
     }

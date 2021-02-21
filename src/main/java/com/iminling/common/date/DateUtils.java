@@ -9,6 +9,12 @@ import java.time.format.DateTimeFormatter;
  */
 public class DateUtils {
 
+    public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    /** 默认日期格式 */
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    /** 默认时间格式 */
+    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+
     public static final int minTimestamp = 0; //最小的时间戳
     public static final int maxTimestamp = 1999999999;//最大的时间戳
     public static final int secondOfHour = 3600;
