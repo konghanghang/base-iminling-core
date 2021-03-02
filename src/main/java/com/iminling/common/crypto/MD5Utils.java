@@ -3,7 +3,11 @@ package com.iminling.common.crypto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Arrays;
 
 /**
  * @author yslao@outlook.com
@@ -15,75 +19,134 @@ public class MD5Utils {
 
     private MD5Utils(){}
 
-    /***
-     * MD5加码 生成32位md5码
-     * @param inStr 待散列字符串
-     * @return  散列值
+    private static final String HEX_NUMS_STR = "0123456789ABCDEF";
+
+    private static final Integer SALT_LENGTH = Integer.valueOf(12);
+
+    /**
+     * 将16进制字符串转为字节数组
+     * @param hex 16进制字符串
+     * @return 字节数组
      */
-    public static String string2MD5(String inStr) {
-        MessageDigest md5 = null;
+    private static byte[] hexStringToByte(String hex) {
+        int len = hex.length() / 2;
+        byte[] result = new byte[len];
+        char[] hexChars = hex.toCharArray();
+        for (int i = 0; i < len; i++) {
+            int pos = i * 2;
+            result[i] = (byte)(HEX_NUMS_STR.indexOf(hexChars[pos]) << 4
+                            | HEX_NUMS_STR.indexOf(hexChars[pos + 1]));
+        }
+        return result;
+    }
+
+    /**
+     * 字节数组转16进制字符串
+     * @param b 字节数组
+     * @return 16进制字符串
+     */
+    private static String byteToHexString(byte[] b) {
+        StringBuffer hexString = new StringBuffer();
+        for (int i = 0; i < b.length; i++) {
+            String hex = Integer.toHexString(b[i] & 0xFF);
+            if (hex.length() == 1)
+                hex = '0' + hex;
+            hexString.append(hex.toUpperCase());
+        }
+        return hexString.toString();
+    }
+
+    /**
+     * 验证字符串是否和密文一致
+     * @param str 字符串
+     * @param digestStr 密文
+     * @return {@link Boolean}
+     */
+    public static boolean validDigest(String str, String digestStr) {
+        boolean result = false;
         try {
-            md5 = MessageDigest.getInstance("MD5");
-        } catch (Exception e) {
-            LOGGER.info(e.toString());
-            e.printStackTrace();
-            return "";
+            // 将16进制字符串转成字节数组
+            byte[] pwdInDb = hexStringToByte(digestStr);
+            // 声明盐变量
+            byte[] salt = new byte[SALT_LENGTH.intValue()];
+            // 将盐从数据中提取出来
+            System.arraycopy(pwdInDb, 0, salt, 0, SALT_LENGTH.intValue());
+            // 创建摘要对象
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // 将盐传入摘要对象
+            md.update(salt);
+            // 将口令数据传入摘要对象
+            md.update(str.getBytes(StandardCharsets.UTF_8));
+            // 生成输入口令的消息摘要
+            byte[] digest = md.digest();
+            // 声明一个保存口令消息摘要得变量
+            byte[] digestInDb = new byte[pwdInDb.length - SALT_LENGTH.intValue()];
+            // 获取口令消息摘要
+            System.arraycopy(pwdInDb, SALT_LENGTH.intValue(), digestInDb, 0, digestInDb.length);
+            // 比较两个消息摘要
+            result = Arrays.equals(digest, digestInDb);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("NoSuchAlgorithmException", e);
         }
-        char[] charArray = inStr.toCharArray();
-        byte[] byteArray = new byte[charArray.length];
-
-        for (int i = 0; i < charArray.length; i++)
-            byteArray[i] = (byte) charArray[i];
-        byte[] md5Bytes = md5.digest(byteArray);
-        StringBuffer hexValue = new StringBuffer();
-        for (int i = 0; i < md5Bytes.length; i++) {
-            int val = ((int) md5Bytes[i]) & 0xff;
-            if (val < 16)
-                hexValue.append("0");
-            hexValue.append(Integer.toHexString(val));
-        }
-        return hexValue.toString();
-
+        return result;
     }
 
     /**
-     * 加密解密算法 执行一次加密，两次解密
-     * @param inStr 待散列字符串
-     * @return 散列值
+     * 带盐加密
+     * @param str 待加密字符串
+     * @return 加密字符串
      */
-    public static String convertMD5(String inStr) {
-
-        char[] a = inStr.toCharArray();
-        for (int i = 0; i < a.length; i++) {
-            a[i] = (char) (a[i] ^ 't');
+    public static String encode(String str) {
+        String encodeStr = null;
+        try {
+            // 随机数生成器
+            SecureRandom random = new SecureRandom();
+            // 盐数组
+            byte[] salt = new byte[SALT_LENGTH.intValue()];
+            // 随机数放入盐数组
+            random.nextBytes(salt);
+            // 创建摘要
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // 传入盐对象
+            md.update(salt);
+            // 传入口令数据
+            md.update(str.getBytes(StandardCharsets.UTF_8));
+            // 获取消息摘要字节数组
+            byte[] digest = md.digest();
+            // 加密后的口令数组变量,要在里边存放盐,所以加上盐的字节长度
+            byte[] pwd = new byte[digest.length + SALT_LENGTH.intValue()];
+            // 将盐的字节拷贝到生成的加密口令字节数组的前12个字节,以便在验证口令的时候取出盐
+            System.arraycopy(salt, 0, pwd, 0, SALT_LENGTH.intValue());
+            // 将消息摘要拷贝到加密口令字节数组,从第13个字节开始
+            System.arraycopy(digest, 0, pwd, SALT_LENGTH.intValue(), digest.length);
+            // 将字节数组格式加密后的口令转化为16进制字符串格式的口令
+            encodeStr = byteToHexString(pwd);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("NoSuchAlgorithmException", e);
         }
-        String s = new String(a);
-        return s;
-
+        return encodeStr;
     }
 
     /**
-     * 判断输入的密码和数据库中保存的MD5密码是否一致
-     * @param inputPassword 输入的密码
-     * @param md5DB 数据库保存的密码
-     * @return 是否匹配
+     * 不带盐加密
+     * @param str 待加密字符串
+     * @return 加密字符串
      */
-    public static boolean passwordIsTrue(String inputPassword,String md5DB) {
-        String md5 = string2MD5(inputPassword);
-        return md5DB.equals(md5);
+    public static String encodeWithoutSalt(String str) {
+        String encodeStr = null;
+        try {
+            // 创建消息摘要
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            // 将口令的数据传入消息摘要对象
+            md.update(str.getBytes(StandardCharsets.UTF_8));
+            // 获得消息摘要的字节数组
+            byte[] digest = md.digest();
+            // 将字节数组转为16进制字符串
+            encodeStr = byteToHexString(digest);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("NoSuchAlgorithmException", e);
+        }
+        return encodeStr;
     }
-
-
-    // 测试主函数
-    public static void main(String args[]) {
-        String s = "123456";
-        LOGGER.info("原始：" + s);
-        String toMd5 = string2MD5(s);
-        LOGGER.info("MD5后：" + toMd5);
-        LOGGER.info("base64:{}", Base64Utils.encode(toMd5));
-        LOGGER.info("密码是否一致：{}", passwordIsTrue(s,toMd5));
-
-    }
-
 
 }
