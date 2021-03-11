@@ -5,7 +5,7 @@
 <parent>
     <groupId>com.iminling</groupId>
     <artifactId>base-iminling-parent</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.3-SNAPSHOT</version>
     <relativePath/>
 </parent>
 ```
@@ -14,7 +14,7 @@
 <dependency>
     <groupId>com.iminling</groupId>
     <artifactId>base-iminling-core</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
 </dependency>
 ```
 ## 功能
@@ -26,6 +26,7 @@
 - [x] 日志记录功能，需自己实现
 - [x] mybatis返回为map时下划线转驼峰
 - [x] 参数校验功能
+- [x] mybatis热加载mapper功能
 
 ## 使用需知
 由于引入了mybatis相关，所以在引入项目的时候如果没有配置数据库相关属性，请在启动类中排除DataSourceAutoConfiguration类，并且需要配置扫描包`com.iminling.core`,详细代码如下：
@@ -40,3 +41,13 @@ public class WebApplication {
 
 }
 ```
+
+## 更新日志
+### 2021-03-11
+1. 添加mybatis热加载mapper功能
+
+    使用说明,默认对`mybatis-plus.mapper-locations`属性配置的目录进行加载
+   
+    需要配置属性`mybatis-plus.refresh-mapper=true`,默认不开启热加载功能
+   
+    可选属性`mybatis-plus.refresh-mapper-interval=10`,刷新间隔,默认为5s
