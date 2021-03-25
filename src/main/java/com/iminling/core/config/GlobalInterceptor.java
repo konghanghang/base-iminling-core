@@ -49,13 +49,16 @@ public class GlobalInterceptor implements HandlerInterceptor {
     private final DefaultRequestDataReader defaultRequestDataReader;
     private final List<Filter> filters;
     private final List<ILogService> logServices;
+    private final boolean enableArgumentLog;
 
     public GlobalInterceptor(List<Filter> filters,
                              List<ILogService> logServices,
-                             DefaultRequestDataReader defaultRequestDataReader) {
+                             DefaultRequestDataReader defaultRequestDataReader,
+                             boolean enableArgumentLog) {
         this.filters = filters;
         this.logServices = logServices;
         this.defaultRequestDataReader = defaultRequestDataReader;
+        this.enableArgumentLog = enableArgumentLog;
     }
 
     @Override
@@ -78,11 +81,14 @@ public class GlobalInterceptor implements HandlerInterceptor {
             requestDataWrapper.parseJsonNode(read);
             if (read != null) {
                 ThreadContext.getLogRecord().setParam(read.toString());
+                if (enableArgumentLog)
+                    log.info("url:{}, 参数：{}", request.getRequestURI(), read.toString());
             }
         } else {
             String queryString = request.getQueryString();
             requestDataWrapper = new RequestDataWrapper(false);
             ThreadContext.getLogRecord().setParam(queryString);
+            log.info("url:{}, 参数：{}", request.getRequestURI(), queryString);
         }
         request.setAttribute(RequestArgumentResolver.REQUEST_DATA_KEY, requestDataWrapper);
         for (Filter filter : filters) {

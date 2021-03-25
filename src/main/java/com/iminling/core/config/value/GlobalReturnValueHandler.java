@@ -4,7 +4,9 @@ import com.iminling.common.json.JsonUtil;
 import com.iminling.core.annotation.EnableResolve;
 import com.iminling.model.common.MessageCode;
 import com.iminling.model.common.ResultModel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -18,8 +20,17 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalReturnValueHandler implements ResponseBodyAdvice<Object> {
+
+    private final ConfigurableEnvironment environment;
+    private final boolean enableResultLog;
+
+    public GlobalReturnValueHandler(ConfigurableEnvironment environment) {
+        this.environment = environment;
+        enableResultLog =  environment.getProperty("application.log.result", Boolean.class, false);
+    }
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -58,8 +69,12 @@ public class GlobalReturnValueHandler implements ResponseBodyAdvice<Object> {
         if (isString) {
             String result = JsonUtil.obj2Str(resultModel);
             response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            if (enableResultLog)
+                log.info("url:{}, 返回结果：{}", request.getURI(), result);
             return result;
         }
+        if (enableResultLog)
+            log.info("url:{}, 返回结果：{}", request.getURI(), resultModel);
         return resultModel;
     }
 

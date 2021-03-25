@@ -104,7 +104,8 @@ public class CoreAutoConfiguration {
         if (!environment.getProperty("filters.log", enable).equals(enable)) {
             logServices.clear();
         }
-        return new GlobalInterceptor(filters, logServices, defaultRequestDataReader);
+        boolean enableArgumentLog = environment.getProperty("application.log.argument", Boolean.class, false);
+        return new GlobalInterceptor(filters, logServices, defaultRequestDataReader, enableArgumentLog);
     }
 
     @Configuration

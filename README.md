@@ -17,6 +17,19 @@
     <version>1.0.2-SNAPSHOT</version>
 </dependency>
 ```
+如果引入SNAPSHOT版本则需要在pom中加入以下配置：
+```xml
+<repositories>
+   <repository>
+      <id>sonatype-snapshots</id>
+      <name>sonatype-snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <snapshots>
+          <enabled>true</enabled>
+      </snapshots>
+   </repository>
+</repositories>
+```
 ## 功能
 - [x] 自定义参数处理
 - [x] 自定义返回值处理 
@@ -51,3 +64,9 @@ public class WebApplication {
     需要配置属性`mybatis-plus.refresh-mapper=true`,默认不开启热加载功能
    
     可选属性`mybatis-plus.refresh-mapper-interval=10`,刷新间隔,默认为5s
+### 2021-03-25
+1. 添加参数和返回值打印(可选，默认关闭)
+
+   配置`application.log.argument`值为true，则开启请求参数打印，默认不打印
+
+   配置`application.log.result`值为true，则开启请求参数打印，默认不打印
