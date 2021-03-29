@@ -171,4 +171,19 @@ public class JsonUtil {
         return objectMapper.convertValue(pojo, javaType);
     }
 
+    /**
+     * 把一个对象转成Type对应的对象
+     * @param pojo 对象
+     * @param type 目标对象类型
+     * @param <T> 泛型
+     * @return 目标对象
+     */
+    public static <T> T convert(Object pojo, Type type) {
+        if (Objects.isNull(pojo)) {
+            return null;
+        }
+        JavaType javaType = objectMapper.getTypeFactory().constructType(type);
+        return objectMapper.convertValue(pojo, javaType);
+    }
+
 }
