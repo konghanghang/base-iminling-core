@@ -12,6 +12,7 @@ import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.*;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -66,6 +67,11 @@ public class RequestArgumentResolver implements HandlerMethodArgumentResolver {
         // 特殊处理@PathVariable注解
         PathVariable pathVariable = parameter.getParameterAnnotation(PathVariable.class);
         if (Objects.nonNull(pathVariable)) {
+            return false;
+        }
+        // 特殊处理@RequestHeader注解
+        RequestHeader requestHeader = parameter.getParameterAnnotation(RequestHeader.class);
+        if (Objects.nonNull(requestHeader)) {
             return false;
         }
         RequestDataWrapper requestDataWrapper = (RequestDataWrapper) request.getAttribute(REQUEST_DATA_KEY);
