@@ -5,7 +5,6 @@ import com.iminling.model.common.MessageCode;
 import com.iminling.model.common.ResultModel;
 import com.iminling.model.exception.AuthorizeException;
 import com.iminling.model.exception.BizException;
-import com.iminling.model.exception.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,6 +18,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ValidationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
