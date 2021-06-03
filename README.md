@@ -55,6 +55,55 @@ public class WebApplication {
 }
 ```
 
+## 功能介绍
+### 自定义参数处理
+在spring中如果想进行下边的参数写法来传递参数，只能使用form-data形式来传递，如果想使用json形式传递，则需要对这两个对象进行复合，用一个新的类，把这两个类做为其中的属性。
+```java
+@PostMapping
+public IPage list(DiaryCondition condition, PageModel pageModel) {
+ }
+```
+本框架里的参数支持如上这样子进行分开写，然后在方法上或类上标注`@EnableResolve`注解，然后就可以正常运行，也不需要使用@RequestBody注解就可以接受json类型的参数，传参只需要这样子：
+```json
+{
+   "condition": {
+      
+   },
+   "pageModel": {
+      
+   }
+}
+```
+
+### 自定义返回值处理
+处理返回的结果，给结果统一添加一层固定的格式，详细见`com.iminling.model.common.ResultModel`.
+
+### controller全局异常处理
+对异常进行分类处理，最终也返回统一格式，详细见`com.iminling.model.common.ResultModel`.
+
+### 登录验证过滤器(需自己实现)
+需要实现`com.iminling.core.filter.LoginFilter`接口，然后重写`doFilter`和`getOrder`方法，然后查询的用户放入`com.iminling.core.util.ThreadContext`中。
+
+### 权限验证过滤器(需自己实现)
+需要实现`com.iminling.core.filter.AuthFilter`接口，实现`doFilter`方法和`getOrder`方法。在controller上使用@Authentication注解(com.iminling.core.annotation.Authentication注解)。
+
+### 日志记录功能，需自己实现
+使用@ApiDesc标注在方法上，然后需要自己实现ILogService接口，具体怎么存用户自行扩展，该实现需要交给spring容器去管理。
+```java
+@ApiDesc(desc = "我是日志详情")
+@GetMapping(value = "/aaa")
+public void get(){
+}
+```
+### 参数校验功能
+因为自定义了参数处理器，所以校验功能单独拿了出来，需要使用本框架的注解@Validate(com.iminling.core.annotation)，使用方法如下：
+```java
+@PostMapping("/register")
+@Validate
+public void register(@NotNull RegisterVo model){
+}
+```
+
 ## 更新日志
 ### 2021-03-11
 1. 添加mybatis热加载mapper功能
