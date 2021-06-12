@@ -1,7 +1,5 @@
 package com.iminling.model.core;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -14,7 +12,6 @@ import java.time.LocalDateTime;
 @Data
 public class BaseUserInfo {
 
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**

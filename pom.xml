@@ -34,7 +34,7 @@
 
     <developers>
         <developer>
-            <name>iminling</name>
+            <name>yslao</name>
             <email>yslao@outlook.com</email>
             <organization>iminling</organization>
             <organizationUrl>https://www.iminling.com</organizationUrl>
@@ -68,6 +68,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

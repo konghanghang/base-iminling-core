@@ -3,6 +3,9 @@ package com.iminling.core.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iminling.common.json.JsonUtil;
 import com.iminling.core.config.argument.DefaultRequestDataReader;
+import com.iminling.core.config.exception.GlobalExceptionHandler;
+import com.iminling.core.config.mybatis.MybatisConfig;
+import com.iminling.core.config.value.GlobalReturnValueHandler;
 import com.iminling.core.filter.AuthFilter;
 import com.iminling.core.filter.Filter;
 import com.iminling.core.filter.LoginFilter;
@@ -10,7 +13,11 @@ import com.iminling.core.service.ILogService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -22,7 +29,7 @@ import java.util.List;
  * @author yslao@outlook.com
  * @since 2021/2/19
  */
-@Configuration
+@Import({MybatisConfig.class})
 public class CoreAutoConfiguration {
 
     /*@Bean
@@ -38,7 +45,19 @@ public class CoreAutoConfiguration {
     }*/
 
     @Bean
-    @ConditionalOnMissingBean(name = "defaultRequestDataReader")
+    @ConditionalOnMissingBean(GlobalExceptionHandler.class)
+    public GlobalExceptionHandler globalExceptionHandler() {
+        return new GlobalExceptionHandler();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(GlobalReturnValueHandler.class)
+    public GlobalReturnValueHandler globalReturnValueHandler(ConfigurableEnvironment environment) {
+        return new GlobalReturnValueHandler(environment);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(DefaultRequestDataReader.class)
     public DefaultRequestDataReader defaultRequestDataReader(ObjectMapper objectMapper) {
         return new DefaultRequestDataReader(objectMapper);
     }
@@ -58,7 +77,7 @@ public class CoreAutoConfiguration {
      * @return {@link GlobalInterceptor}
      */
     @Bean
-    @ConditionalOnMissingBean(name = "globalInterceptor")
+    @ConditionalOnMissingBean(GlobalInterceptor.class)
     public GlobalInterceptor globalInterceptor(ConfigurableEnvironment environment,
                                                DefaultRequestDataReader defaultRequestDataReader,
                                                List<LoginFilter> loginFilter, List<AuthFilter> authFilter, List<ILogService> logServices) {
@@ -102,6 +121,25 @@ public class CoreAutoConfiguration {
         public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
             // resolvers.add(new RequestArgumentResolver(getObjectMapper()));
         }*/
+
+        @Bean
+        public CorsFilter corsFilter() {
+            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+            // 对接口配置跨域设置
+            source.registerCorsConfiguration("/**", buildConfig());
+            return new CorsFilter(source);
+        }
+
+        private CorsConfiguration buildConfig() {
+            CorsConfiguration corsConfiguration = new CorsConfiguration();
+            // 允许任何域名使用
+            corsConfiguration.addAllowedOrigin("*");
+            // 允许任何头
+            corsConfiguration.addAllowedHeader("*");
+            // 允许任何方法（post、get等）
+            corsConfiguration.addAllowedMethod("*");
+            return corsConfiguration;
+        }
     }
 
 }
