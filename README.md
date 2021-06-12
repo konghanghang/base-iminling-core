@@ -1,20 +1,12 @@
 # base-iminling-core
 基础服务包，抽取公用方法，方便自己以后在项目中快速引用。
-服务使用springboot版本为2.3.5.RELEASE。整体服务依赖base-iminling-parent父pom，坐标引入如下：
-```xml
-<parent>
-    <groupId>com.iminling</groupId>
-    <artifactId>base-iminling-parent</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
-    <relativePath/>
-</parent>
-```
+服务使用springboot版本为2.3.5.RELEASE。
 引入本基础模块代码如下：
 ```xml
 <dependency>
     <groupId>com.iminling</groupId>
-    <artifactId>base-iminling-core</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <artifactId>iminling-core</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
 </dependency>
 ```
 如果引入SNAPSHOT版本则需要在pom中加入以下配置：
@@ -65,10 +57,10 @@ public IPage list(DiaryCondition condition, PageModel pageModel) {
 ```
 
 ### 自定义返回值处理
-处理返回的结果，给结果统一添加一层固定的格式，详细见`com.iminling.model.common.ResultModel`.
+处理返回的结果，给结果统一添加一层固定的格式，详细见`com.iminling.core.model.common.ResultModel`.
 
 ### controller全局异常处理
-对异常进行分类处理，最终也返回统一格式，详细见`com.iminling.model.common.ResultModel`.
+对异常进行分类处理，最终也返回统一格式，详细见`com.iminling.core.model.common.ResultModel`.
 
 ### 登录验证过滤器(需自己实现)
 需要实现`com.iminling.core.filter.LoginFilter`接口，然后重写`doFilter`和`getOrder`方法，然后查询的用户放入`com.iminling.core.util.ThreadContext`中。
