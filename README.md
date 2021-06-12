@@ -42,18 +42,7 @@
 - [x] mybatis热加载mapper功能
 
 ## 使用需知
-由于引入了mybatis相关，所以在引入项目的时候如果没有配置数据库相关属性，请在启动类中排除DataSourceAutoConfiguration类，并且需要配置扫描包`com.iminling.core`,详细代码如下：
-```java
-@SpringBootApplication(scanBasePackages = {"com.iminling.core", "com.test"},
-        exclude = DataSourceAutoConfiguration.class)
-public class WebApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(WebApplication.class, args);
-    }
-
-}
-```
+本jar中使用spring spi机制进行bean的添加，只需引入本依赖就可以了。另外mybatis-plus是可选依赖，如果需要使用mybatis相关则自行添加mybatis-plus-boot-starter依赖。
 
 ## 功能介绍
 ### 自定义参数处理
