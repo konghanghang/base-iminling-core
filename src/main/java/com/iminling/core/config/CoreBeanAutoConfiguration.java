@@ -3,6 +3,8 @@ package com.iminling.core.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iminling.common.json.JsonUtil;
 import com.iminling.core.config.argument.DefaultRequestDataReader;
+import com.iminling.core.config.argument.GlobalArgumentBeanPostProcessor;
+import com.iminling.core.config.argument.GlobalArgumentResolverConfig;
 import com.iminling.core.config.exception.GlobalExceptionHandler;
 import com.iminling.core.config.mybatis.MybatisConfig;
 import com.iminling.core.config.value.GlobalReturnValueHandler;
@@ -12,14 +14,8 @@ import com.iminling.core.filter.LoginFilter;
 import com.iminling.core.service.ILogService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
@@ -30,7 +26,7 @@ import java.util.List;
  * @since 2021/2/19
  */
 @Import({MybatisConfig.class})
-public class CoreAutoConfiguration {
+public class CoreBeanAutoConfiguration implements WebMvcConfigurer {
 
     /*@Bean
     @ConditionalOnMissingBean(name = "defaultAuthFilter")
@@ -67,6 +63,12 @@ public class CoreAutoConfiguration {
         return JsonUtil.getInstant();
     }
 
+    @Bean
+    @ConditionalOnMissingBean(GlobalArgumentResolverConfig.class)
+    public GlobalArgumentBeanPostProcessor globalArgumentBeanPostProcessor() {
+        return new GlobalArgumentBeanPostProcessor();
+    }
+
     /**
      * 生成globalInterceptor
      * @param environment 环境信息
@@ -95,51 +97,4 @@ public class CoreAutoConfiguration {
         boolean enableArgumentLog = environment.getProperty("application.log.argument", Boolean.class, false);
         return new GlobalInterceptor(filters, logServices, defaultRequestDataReader, enableArgumentLog);
     }
-
-    @Configuration
-    // @EnableWebMvc
-    class CustomMvcConfigure implements WebMvcConfigurer {
-
-        private final GlobalInterceptor globalInterceptor;
-
-        public CustomMvcConfigure(GlobalInterceptor globalInterceptor) {
-            this.globalInterceptor = globalInterceptor;
-        }
-
-        @Override
-        public void addInterceptors(InterceptorRegistry registry) {
-            registry.addInterceptor(globalInterceptor);
-        }
-
-        @Override
-        public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
-            registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-        }
-
-        /*@Override
-        public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-            // resolvers.add(new RequestArgumentResolver(getObjectMapper()));
-        }*/
-
-        @Bean
-        public CorsFilter corsFilter() {
-            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-            // 对接口配置跨域设置
-            source.registerCorsConfiguration("/**", buildConfig());
-            return new CorsFilter(source);
-        }
-
-        private CorsConfiguration buildConfig() {
-            CorsConfiguration corsConfiguration = new CorsConfiguration();
-            // 允许任何域名使用
-            corsConfiguration.addAllowedOrigin("*");
-            // 允许任何头
-            corsConfiguration.addAllowedHeader("*");
-            // 允许任何方法（post、get等）
-            corsConfiguration.addAllowedMethod("*");
-            return corsConfiguration;
-        }
-    }
-
 }

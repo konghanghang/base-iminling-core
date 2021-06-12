@@ -11,15 +11,16 @@ import java.util.List;
 
 /**
  * 自定义的参数处理器放在第一位
+ * 如果springboot不扫描当前包则这个类无法生效
  */
 @Configuration
-public class ArgumentResolverConfig {
+public class GlobalArgumentResolverConfig {
 
     private final RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
     private final ObjectMapper objectMapper;
 
-    public ArgumentResolverConfig(RequestMappingHandlerAdapter requestMappingHandlerAdapter, ObjectMapper objectMapper) {
+    public GlobalArgumentResolverConfig(RequestMappingHandlerAdapter requestMappingHandlerAdapter, ObjectMapper objectMapper) {
         this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
         this.objectMapper = objectMapper;
     }
@@ -27,7 +28,7 @@ public class ArgumentResolverConfig {
     @PostConstruct
     public void argumentResolver() {
         List<HandlerMethodArgumentResolver> argumentResolvers = new ArrayList<>();
-        argumentResolvers.add(new RequestArgumentResolver(objectMapper));
+        argumentResolvers.add(new GlobalArgumentResolver(objectMapper));
         argumentResolvers.addAll(requestMappingHandlerAdapter.getArgumentResolvers());
         requestMappingHandlerAdapter.setArgumentResolvers(argumentResolvers);
     }

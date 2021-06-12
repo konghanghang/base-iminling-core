@@ -29,15 +29,15 @@ import java.util.Optional;
 /**
  * 自定义参数处理器
  */
-public class RequestArgumentResolver implements HandlerMethodArgumentResolver {
+public class GlobalArgumentResolver implements HandlerMethodArgumentResolver {
 
-    public static final String REQUEST_DATA_KEY = RequestArgumentResolver.class.getName() + ".requestData";
+    public static final String REQUEST_DATA_KEY = GlobalArgumentResolver.class.getName() + ".requestData";
 
-    private final Logger logger = LoggerFactory.getLogger(RequestArgumentResolver.class);
+    private final Logger logger = LoggerFactory.getLogger(GlobalArgumentResolver.class);
 
     private ObjectMapper objectMapper;
 
-    public RequestArgumentResolver(ObjectMapper objectMapper) {
+    public GlobalArgumentResolver(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

@@ -53,7 +53,7 @@ public class JsonUtil {
 
     /**
      * 获取objectMapper
-     * @return
+     * @return ObjectMapper
      */
     public static ObjectMapper getInstant(){
         return objectMapper;

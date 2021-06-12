@@ -2,7 +2,7 @@ package com.iminling.core.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iminling.core.config.argument.DefaultRequestDataReader;
-import com.iminling.core.config.argument.RequestArgumentResolver;
+import com.iminling.core.config.argument.GlobalArgumentResolver;
 import com.iminling.core.config.argument.RequestDataWrapper;
 import com.iminling.core.filter.Filter;
 import com.iminling.core.service.ILogService;
@@ -90,7 +90,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
             ThreadContext.getLogRecord().setParam(queryString);
             log.info("url:{}, 参数：{}", request.getRequestURI(), queryString);
         }
-        request.setAttribute(RequestArgumentResolver.REQUEST_DATA_KEY, requestDataWrapper);
+        request.setAttribute(GlobalArgumentResolver.REQUEST_DATA_KEY, requestDataWrapper);
         for (Filter filter : filters) {
             try {
                 filter.doFilter(handlerMethod, request);

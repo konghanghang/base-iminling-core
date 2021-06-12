@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.iminling.core.config.CoreAutoConfiguration
+  com.iminling.core.config.CoreBeanAutoConfiguration,\
+  com.iminling.core.config.CustomMvcAutoConfiguration
