@@ -88,7 +88,8 @@ public class GlobalInterceptor implements HandlerInterceptor {
             String queryString = request.getQueryString();
             requestDataWrapper = new RequestDataWrapper(false);
             ThreadContext.getLogRecord().setParam(queryString);
-            log.info("url:{}, 参数：{}", request.getRequestURI(), queryString);
+            if (enableArgumentLog)
+                log.info("url:{}, 参数：{}", request.getRequestURI(), queryString);
         }
         request.setAttribute(GlobalArgumentResolver.REQUEST_DATA_KEY, requestDataWrapper);
         for (Filter filter : filters) {
