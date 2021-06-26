@@ -6,7 +6,7 @@
 <dependency>
     <groupId>com.iminling</groupId>
     <artifactId>iminling-core</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 如果引入SNAPSHOT版本则需要在pom中加入以下配置：
