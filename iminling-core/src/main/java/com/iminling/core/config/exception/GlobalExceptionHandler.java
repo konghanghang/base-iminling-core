@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BindException.class)
-    //@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResultModel validExceptionHandler(BindException e) {
         List<FieldError> fieldErrors=e.getBindingResult().getFieldErrors();
         Map<String, String> map = new HashMap<>();
@@ -41,19 +42,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    //@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResultModel methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         return ResultModel.isFail(fieldErrors.get(0).getDefaultMessage());
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    //@ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResultModel noHandlerFoundExceptionHandler(NoHandlerFoundException e, HttpServletRequest request) {
         return ResultModel.isFail(String.format("url:%s not found", request.getServletPath()), HttpStatus.NOT_FOUND.value());
     }
 
     @ExceptionHandler(AuthorizeException.class)
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED)
     public ResultModel authorizeExceptionHandler(AuthorizeException e, HttpServletRequest request, HttpServletResponse response) {
         logger.error("AuthorizeException, url:{}, method:{}, code:{}, message:{}", request.getServletPath(), request.getMethod(),
                 e.getMessageCode().getCode(), e.getMessageCode().getMessage());
@@ -62,20 +64,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    //@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResultModel missingServletRequestParameterExceptionHandler(MissingServletRequestParameterException e, HttpServletRequest request) {
         return ResultModel.isFail(e.getParameterName() + "不能为空");
     }
 
     @ExceptionHandler(ValidationException.class)
-    //@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResultModel validationExceptionHandler(ValidationException e, HttpServletRequest request) {
         logger.error("ValidationException, url:{}, method:{}, message:{}", request.getRequestURI(), request.getMethod(), e.getMessage());
         return ResultModel.isFail(e.getMessage());
     }
 
     @ExceptionHandler(BizException.class)
-    //@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResultModel baseExceptionHandler(BizException e) {
         if (Objects.nonNull(e.getMessageCode())){
             return ResultModel.isFail(e.getMessageCode());
