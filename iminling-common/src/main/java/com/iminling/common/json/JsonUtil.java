@@ -1,9 +1,10 @@
 package com.iminling.common.json;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -12,10 +13,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.iminling.common.date.DateUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
@@ -23,12 +20,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JsonUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtil.class);
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    private static final XmlMapper XML_MAPPER = createXmlMapper();
 
     private JsonUtil(){}
 
@@ -36,9 +38,9 @@ public class JsonUtil {
         // 设置日期对象的输出格式
         // objectMapper.setDateFormat(new SimpleDateFormat(DateUtils.DEFAULT_DATE_TIME_FORMAT, Locale.CHINESE));
         // 设置输入时忽略在json字符串中存在 但在java对象实际没有的属性
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // 允许备注
-        objectMapper.enable(JsonParser.Feature.ALLOW_COMMENTS);
+        OBJECT_MAPPER.enable(JsonParser.Feature.ALLOW_COMMENTS);
         // objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
 
         JavaTimeModule javaTimeModule = new JavaTimeModule();
@@ -48,7 +50,23 @@ public class JsonUtil {
         javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_TIME_FORMAT)));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_FORMAT)));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_TIME_FORMAT)));
-        objectMapper.registerModule(javaTimeModule);
+        OBJECT_MAPPER.registerModule(javaTimeModule);
+    }
+
+    public static XmlMapper createXmlMapper() {
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+        xmlMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        xmlMapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
+        xmlMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        xmlMapper.registerModule(new JavaTimeModule());
+        xmlMapper.enable(MapperFeature.USE_STD_BEAN_NAMING);
+        // 是否添加<?xml version='1.0' encoding='UTF-8'?>
+        // xmlMapper.enable(Feature.WRITE_XML_DECLARATION);
+        return xmlMapper;
     }
 
     /**
@@ -56,7 +74,7 @@ public class JsonUtil {
      * @return ObjectMapper
      */
     public static ObjectMapper getInstant(){
-        return objectMapper;
+        return OBJECT_MAPPER;
     }
 
     /**
@@ -114,7 +132,7 @@ public class JsonUtil {
             return null;
         }
         try {
-            return obj instanceof String ? (String)obj :  objectMapper.writeValueAsString(obj);
+            return obj instanceof String ? (String)obj :  OBJECT_MAPPER.writeValueAsString(obj);
         } catch (Exception e) {
             LOGGER.warn("Parse Object to String error",e);
             return null;
@@ -132,7 +150,7 @@ public class JsonUtil {
             return null;
         }
         try {
-            return obj instanceof String ? (String)obj :  objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+            return obj instanceof String ? (String)obj :  OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
         } catch (Exception e) {
             LOGGER.warn("Parse Object to String error",e);
             return null;
@@ -151,7 +169,7 @@ public class JsonUtil {
             return null;
         }
         try {
-            return clazz.equals(String.class)? (T)str : objectMapper.readValue(str, clazz);
+            return clazz.equals(String.class)? (T)str : OBJECT_MAPPER.readValue(str, clazz);
         } catch (Exception e) {
             LOGGER.warn("Parse String to Object error",e);
             return null;
@@ -167,9 +185,9 @@ public class JsonUtil {
      * @return 集合对象
      */
     public static <T> T str2Obj(String str, Class<?> collectionClass, Class<?>... elementClasses){
-        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClass,elementClasses);
+        JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(collectionClass,elementClasses);
         try {
-            return objectMapper.readValue(str,javaType);
+            return OBJECT_MAPPER.readValue(str,javaType);
         } catch (Exception e) {
             LOGGER.warn("Parse String to Object error",e);
             return null;
@@ -187,7 +205,7 @@ public class JsonUtil {
         if (Objects.isNull(pojo)) {
             return null;
         }
-        return objectMapper.convertValue(pojo, target);
+        return OBJECT_MAPPER.convertValue(pojo, target);
     }
 
     /**
@@ -202,8 +220,8 @@ public class JsonUtil {
         if (Objects.isNull(pojo)) {
             return null;
         }
-        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClass, elementClass);
-        return objectMapper.convertValue(pojo, javaType);
+        JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(collectionClass, elementClass);
+        return OBJECT_MAPPER.convertValue(pojo, javaType);
     }
 
     /**
@@ -217,8 +235,24 @@ public class JsonUtil {
         if (Objects.isNull(pojo)) {
             return null;
         }
-        JavaType javaType = objectMapper.getTypeFactory().constructType(type);
-        return objectMapper.convertValue(pojo, javaType);
+        JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructType(type);
+        return OBJECT_MAPPER.convertValue(pojo, javaType);
+    }
+
+    public static <T> T xml2Obj(String xmlStr, Class<T> clazz) {
+        try {
+            return XML_MAPPER.readValue(xmlStr, clazz);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("序列化xml异常,xml:" + xmlStr, e);
+        }
+    }
+
+    public static <T> String Obj2xml(T obj) {
+        try {
+            return XML_MAPPER.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("对象转xml异常,xml。", e);
+        }
     }
 
 }

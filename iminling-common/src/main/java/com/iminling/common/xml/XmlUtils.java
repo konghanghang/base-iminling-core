@@ -24,6 +24,7 @@ import java.util.Set;
  * XML通用处理类
  * @author yslao@outlook.com
  */
+@Deprecated
 public class XmlUtils {
 
     /**
