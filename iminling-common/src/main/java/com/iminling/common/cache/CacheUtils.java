@@ -9,10 +9,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * 简单的缓存工具类
+ * 简单的缓存工具类, 改使用caffeine
  * @author yslao@outlook.com
  * @since 2021/2/19
  */
+@Deprecated
 public class CacheUtils {
 
     private CacheUtils(){}
@@ -20,7 +21,8 @@ public class CacheUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheUtils.class);
 
     private static final Map<String, CacheData> CACHE_DATA = new ConcurrentHashMap<>();
-    private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+    // 使用线程池去处理过期数据
+    // private static final ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
 
     /**
      * 获取数据
