@@ -1,7 +1,5 @@
 package com.iminling.model.common;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.iminling.model.page.Pagination;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -79,13 +77,7 @@ public class ResultModel<T> {
     }
 
     public ResultModel setData(T data){
-        if (data instanceof IPage){
-            IPage page = (IPage) data;
-            Pagination pagination = new Pagination<>(page);
-            this.data = (T) pagination;
-        } else {
-            this.data = data;
-        }
+        this.data = data;
         return this;
     }
 }

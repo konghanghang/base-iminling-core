@@ -37,4 +37,16 @@ public class Pagination<T> {
         this.pageModel.setPageSize(page.getSize());
         this.pageModel.setTotal(page.getTotal());
     }
+
+    public static <T> Pagination<T> build(IPage<T> page) {
+        Pagination<T> pagination = new Pagination<>();
+        PageModel pageModel = new PageModel();
+        pageModel.setPageNum(page.getCurrent());
+        pageModel.setPages(page.getPages());
+        pageModel.setPageSize(page.getSize());
+        pageModel.setTotal(page.getTotal());
+        pagination.setList(page.getRecords());
+        pagination.setPageModel(pageModel);
+        return pagination;
+    }
 }
