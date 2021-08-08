@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    //@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResultModel exceptionHandler(Exception e, HttpServletRequest request) {
         logger.error("Exception, url:{}, message:{}", request.getRequestURI(), e.getMessage(), e);
         return ResultModel.isFail(MessageCode.RESULT_FAIL);

@@ -6,6 +6,10 @@ import com.iminling.model.core.ClientInfo;
 import com.iminling.model.core.LogRecord;
 import com.iminling.model.core.RequestInfo;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 public final class ThreadContext {
 
     private ThreadContext() {}
@@ -42,10 +46,27 @@ public final class ThreadContext {
         LOG_RECORD.set(logRecord);
     }
 
+    private final static ThreadLocal<Map<String, Object>> PROPERTIES = new ThreadLocal<>();
+    public static Object getAttribute(String key) {
+        Map<String, Object> map = PROPERTIES.get();
+        if (Objects.isNull(map)) {
+            return null;
+        }
+        return map.get(key);
+    }
+    public static void setAttribute(String key, Object value) {
+        Map<String, Object> map = PROPERTIES.get();
+        if (Objects.isNull(map)) {
+            map = new HashMap<>();
+        }
+        map.put(key, value);
+    }
+
     public static void clear() {
         CLIENT_INFO.remove();
         USER_INFO.remove();
         REQUEST_INFO.remove();
         LOG_RECORD.remove();
+        PROPERTIES.remove();
     }
 }
