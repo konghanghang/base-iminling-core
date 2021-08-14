@@ -53,6 +53,15 @@ public class MybatisConfig implements ApplicationContextAware {
     }
 
     /**
+     * 自定义参数填充
+     * @return
+     */
+    @Bean
+    public CustomizeMetaObjectHandler customizeMetaObjectHandler() {
+        return new CustomizeMetaObjectHandler();
+    }
+
+    /**
      * map接收,转驼峰
      * @return ConfigurationCustomizer
      */

@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * caffeine缓存抽象类
- * @param <K>
- * @param <V>
+ * @param <K> 键
+ * @param <V> 值
  */
 public abstract class AbstractLocalCache<K, V> {
 
