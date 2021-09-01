@@ -1,35 +1,47 @@
 package com.iminling.core.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.iminling.common.json.JsonUtil;
+import com.iminling.core.ApplicationConstant;
+import com.iminling.core.annotation.EnableResolve;
+import com.iminling.core.annotation.EnableResolve.ResolveStrategy;
 import com.iminling.core.config.argument.DefaultRequestDataReader;
 import com.iminling.core.config.argument.GlobalArgumentResolver;
 import com.iminling.core.config.argument.RequestDataWrapper;
 import com.iminling.core.filter.Filter;
 import com.iminling.core.service.ILogService;
+import com.iminling.core.util.IpUtils;
 import com.iminling.core.util.ResponseWriter;
 import com.iminling.core.util.ThreadContext;
 import com.iminling.model.core.ClientInfo;
 import com.iminling.model.core.LogRecord;
 import com.iminling.model.exception.AuthorizeException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.URLDecoder;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
+import org.springframework.web.util.WebUtils;
 
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalInterceptor implements HandlerInterceptor {
 
     private final String AUTHORIZATION = "Authorization";
@@ -49,17 +61,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
     private final DefaultRequestDataReader defaultRequestDataReader;
     private final List<Filter> filters;
     private final List<ILogService> logServices;
-    private final boolean enableArgumentLog;
-
-    public GlobalInterceptor(List<Filter> filters,
-                             List<ILogService> logServices,
-                             DefaultRequestDataReader defaultRequestDataReader,
-                             boolean enableArgumentLog) {
-        this.filters = filters;
-        this.logServices = logServices;
-        this.defaultRequestDataReader = defaultRequestDataReader;
-        this.enableArgumentLog = enableArgumentLog;
-    }
+    private final ConfigurableEnvironment environment;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -72,26 +74,14 @@ public class GlobalInterceptor implements HandlerInterceptor {
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
         initClientInfo(request);
-        initLogRecord(request, handlerMethod);
-        ServletServerHttpRequest inputMessage = new ServletServerHttpRequest(request);
-        RequestDataWrapper requestDataWrapper;
-        if (defaultRequestDataReader.canRead(inputMessage)) {
-            requestDataWrapper = new RequestDataWrapper(true);
-            JsonNode read = defaultRequestDataReader.read(inputMessage, handlerMethod);
-            requestDataWrapper.parseJsonNode(read);
-            if (read != null) {
-                ThreadContext.getLogRecord().setParam(read.toString());
-                if (enableArgumentLog)
-                    log.info("url:{}, 参数：{}", request.getRequestURI(), read.toString());
-            }
-        } else {
-            String queryString = request.getQueryString();
-            requestDataWrapper = new RequestDataWrapper(false);
-            ThreadContext.getLogRecord().setParam(queryString);
-            if (enableArgumentLog)
-                log.info("url:{}, 参数：{}", request.getRequestURI(), queryString);
+        EnableResolve enableResolve = handlerMethod.getMethodAnnotation(EnableResolve.class);
+        if (Objects.isNull(enableResolve)) {
+            enableResolve = handlerMethod.getBeanType().getAnnotation(EnableResolve.class);
         }
-        request.setAttribute(GlobalArgumentResolver.REQUEST_DATA_KEY, requestDataWrapper);
+        if (Objects.nonNull(enableResolve) &&
+            (enableResolve.value().equals(ResolveStrategy.ALL) || enableResolve.value().equals(ResolveStrategy.ARGUMENTS))) {
+            handlerCustomizeArgument(request, handlerMethod);
+        }
         for (Filter filter : filters) {
             try {
                 filter.doFilter(handlerMethod, request);
@@ -103,6 +93,28 @@ public class GlobalInterceptor implements HandlerInterceptor {
         return true;
     }
 
+    /**
+     * 处理自定义参数处理器解析
+     * @param request   请求
+     * @param handlerMethod handlerMethod
+     * @throws IOException
+     */
+    private void handlerCustomizeArgument(HttpServletRequest request, HandlerMethod handlerMethod) throws IOException {
+        ServletServerHttpRequest inputMessage = new ServletServerHttpRequest(request);
+        RequestDataWrapper requestDataWrapper = new RequestDataWrapper(false);
+        request.setAttribute(GlobalArgumentResolver.REQUEST_DATA_KEY, requestDataWrapper);
+        if (defaultRequestDataReader.canRead(inputMessage)) {
+            requestDataWrapper.setCanRead(true);
+            JsonNode read = defaultRequestDataReader.read(inputMessage, handlerMethod);
+            requestDataWrapper.parseJsonNode(read);
+            if (read != null) {
+                ThreadContext.getLogRecord().setBody(read.toString());
+            }
+        }
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        ThreadContext.getLogRecord().setParam(JsonUtil.obj2Str(parameterMap));
+    }
+
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
                            @Nullable ModelAndView modelAndView) throws Exception {
@@ -111,6 +123,14 @@ public class GlobalInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
                                 @Nullable Exception ex) throws Exception {
+        boolean enableArgumentLog = environment.getProperty(ApplicationConstant.KEY_LOGGER_ARGUMENTS, Boolean.class, false);
+        if (enableArgumentLog) {
+            handlerArgument(request);
+        }
+        boolean enableResultLog = environment.getProperty(ApplicationConstant.KEY_LOGGER_RESULT, Boolean.class, false);
+        if (enableResultLog) {
+            handlerResult(request, response);
+        }
         LogRecord logRecord = ThreadContext.getLogRecord();
         if (Objects.nonNull(logRecord)) {
             long executeTime = System.currentTimeMillis() - logRecord.getRequestTime();
@@ -122,34 +142,57 @@ public class GlobalInterceptor implements HandlerInterceptor {
     }
 
     /**
+     * 处理结果打印
+     * @param request   request
+     * @param response  response
+     * @throws IOException
+     */
+    private void handlerResult(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ContentCachingResponseWrapper responseWrapper = WebUtils.getNativeResponse(response, ContentCachingResponseWrapper.class);
+        if (Objects.nonNull(responseWrapper)) {
+            responseWrapper.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            byte[] buf = responseWrapper.getContentAsByteArray();
+            if (buf.length > 0) {
+                String result = new String(buf, 0, buf.length, responseWrapper.getCharacterEncoding());
+                log.info("url:{}, result:{}", request.getRequestURI(), result);
+            }
+            // Do not forget this line after reading response content or actual response will be empty!
+            responseWrapper.copyBodyToResponse();
+        }
+    }
+
+    /**
+     * 处理参数打印
+     * @param request   request
+     * @throws UnsupportedEncodingException
+     */
+    private void handlerArgument(HttpServletRequest request) throws UnsupportedEncodingException {
+        ContentCachingRequestWrapper requestWrapper = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
+        if (Objects.nonNull(requestWrapper)) {
+            requestWrapper.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            byte[] buf = requestWrapper.getContentAsByteArray();
+            if (buf.length > 0) {
+                String requestBody = new String(buf, 0, buf.length, requestWrapper.getCharacterEncoding());
+                ThreadContext.getLogRecord().setBody(requestBody);
+            }
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            ThreadContext.getLogRecord().setParam(JsonUtil.obj2Str(parameterMap));
+        }
+        log.info("url:{}, queryString:{}, body：{}", request.getRequestURI(), ThreadContext.getLogRecord().getParam(), ThreadContext.getLogRecord().getBody());
+    }
+
+    /**
      * 初始化ClientInfo
      * @param request request
      */
     private void initClientInfo(HttpServletRequest request) {
         ClientInfo clientInfo = new ClientInfo();
-        clientInfo.setRequestIp(getRemoteIpAddr(request));
+        clientInfo.setRequestIp(IpUtils.getRemoteIpAddr(request));
         clientInfo.setContextPath(request.getContextPath());
         clientInfo.setServletPath(request.getServletPath());
         clientInfo.setPath(getPath(request));
         clientInfo.setToken(getToken(request));
         ThreadContext.setClientInfo(clientInfo);
-    }
-
-    /**
-     * 初始化logRecord
-     * @param request request
-     * @param handlerMethod handlerMethod
-     */
-    private void initLogRecord(HttpServletRequest request, HandlerMethod handlerMethod) {
-        LogRecord logRecord = new LogRecord();
-        logRecord.setRequestTime(System.currentTimeMillis());
-        logRecord.setIp(getRemoteIpAddr(request));
-        logRecord.setUri(request.getRequestURI());
-        /*ApiDesc annotation1 = handlerMethod.getBeanType().getAnnotation(ApiDesc.class);
-        if (Objects.nonNull(annotation1)) {
-            logRecord.setModule(annotation1.module().getValue());
-        }*/
-        ThreadContext.setLogRecord(logRecord);
     }
 
     /**
@@ -175,37 +218,6 @@ public class GlobalInterceptor implements HandlerInterceptor {
             }
         }
         return path;
-    }
-
-    /**
-     * 获取真实ip
-     * @param request 请求
-     * @return 真实ip
-     */
-    private String getRemoteIpAddr(HttpServletRequest request) {
-        String unknown = "unknown";
-        String remoteIpAddr = unknown;
-        try {
-            String ipAddress = request.getHeader("x-forwarded-for");
-            if (ipAddress == null || ipAddress.length() == 0 || unknown.equalsIgnoreCase(ipAddress)) {
-                ipAddress = request.getHeader("Proxy-Client-IP");
-            }
-            if (ipAddress == null || ipAddress.length() == 0 || unknown.equalsIgnoreCase(ipAddress)) {
-                ipAddress = request.getHeader("WL-Proxy-Client-IP");
-            }
-            if (ipAddress == null || ipAddress.length() == 0 || unknown.equalsIgnoreCase(ipAddress)) {
-                ipAddress = request.getRemoteAddr();
-                if ("127.0.0.1".equals(ipAddress) || "0:0:0:0:0:0:0:1".equals(ipAddress)){
-                    ipAddress = InetAddress.getLocalHost().getHostAddress();
-                }
-            } if (ipAddress != null && ipAddress.indexOf(',') > 0) {
-                ipAddress = ipAddress.substring(0, ipAddress.indexOf(','));
-            }
-            remoteIpAddr = ipAddress;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-        return remoteIpAddr;
     }
 
     /**

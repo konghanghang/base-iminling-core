@@ -39,6 +39,11 @@ public class LogRecord implements Serializable {
     private Integer responseStatus;
 
     /**
+     * 请求体
+     */
+    private String body;
+
+    /**
      * 请求参数
      */
     private String param;

@@ -2,6 +2,7 @@ package com.iminling.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iminling.common.json.JsonUtil;
+import com.iminling.core.ApplicationConstant;
 import com.iminling.core.config.argument.DefaultRequestDataReader;
 import com.iminling.core.config.argument.GlobalArgumentBeanPostProcessor;
 import com.iminling.core.config.argument.GlobalArgumentResolverConfig;
@@ -9,6 +10,7 @@ import com.iminling.core.config.exception.GlobalExceptionHandler;
 import com.iminling.core.config.mybatis.MybatisConfig;
 import com.iminling.core.config.value.GlobalReturnValueHandler;
 import com.iminling.core.filter.AuthFilter;
+import com.iminling.core.filter.CustomizeGlobalFilter;
 import com.iminling.core.filter.Filter;
 import com.iminling.core.filter.LoginFilter;
 import com.iminling.core.service.ILogService;
@@ -41,6 +43,12 @@ public class CoreBeanAutoConfiguration implements WebMvcConfigurer {
     }*/
 
     @Bean
+    @ConditionalOnMissingBean(CustomizeGlobalFilter.class)
+    public CustomizeGlobalFilter customizeGlobalFilter() {
+        return new CustomizeGlobalFilter();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(GlobalExceptionHandler.class)
     public GlobalExceptionHandler globalExceptionHandler() {
         return new GlobalExceptionHandler();
@@ -48,8 +56,8 @@ public class CoreBeanAutoConfiguration implements WebMvcConfigurer {
 
     @Bean
     @ConditionalOnMissingBean(GlobalReturnValueHandler.class)
-    public GlobalReturnValueHandler globalReturnValueHandler(ConfigurableEnvironment environment) {
-        return new GlobalReturnValueHandler(environment);
+    public GlobalReturnValueHandler globalReturnValueHandler() {
+        return new GlobalReturnValueHandler();
     }
 
     @Bean
@@ -85,16 +93,15 @@ public class CoreBeanAutoConfiguration implements WebMvcConfigurer {
                                                List<LoginFilter> loginFilter, List<AuthFilter> authFilter, List<ILogService> logServices) {
         List<Filter> filters = new ArrayList<>(4);
         String enable = "enable";
-        if (environment.getProperty("filters.login", enable).equals(enable)) {
+        if (environment.getProperty(ApplicationConstant.KEY_FILTER_LOGIN, enable).equals(enable)) {
             filters.addAll(loginFilter);
         }
-        if (environment.getProperty("filters.auth", enable).equals(enable)) {
+        if (environment.getProperty(ApplicationConstant.KEY_FILTER_AUTH, enable).equals(enable)) {
             filters.addAll(authFilter);
         }
-        if (!environment.getProperty("filters.log", enable).equals(enable)) {
+        if (!environment.getProperty(ApplicationConstant.KEY_FILTER_LOG, enable).equals(enable)) {
             logServices.clear();
         }
-        boolean enableArgumentLog = environment.getProperty("application.log.argument", Boolean.class, false);
-        return new GlobalInterceptor(filters, logServices, defaultRequestDataReader, enableArgumentLog);
+        return new GlobalInterceptor(defaultRequestDataReader, filters, logServices, environment);
     }
 }
