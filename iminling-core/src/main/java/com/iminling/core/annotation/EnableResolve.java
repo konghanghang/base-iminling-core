@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface EnableResolve {
 
-    ResolveStrategy value() default ResolveStrategy.ALL;
+    ResolveStrategy value() default ResolveStrategy.RETURN_VALUE;
 
     enum ResolveStrategy{
         NONE,
