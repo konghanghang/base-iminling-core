@@ -55,7 +55,7 @@ public class GlobalArgumentResolver implements HandlerMethodArgumentResolver {
             return false;
         }
         EnableResolve.ResolveStrategy value = enableResolve.value();
-        return value == EnableResolve.ResolveStrategy.ALL || value == EnableResolve.ResolveStrategy.ARGUMENTS;
+        return value.equals(EnableResolve.ResolveStrategy.ALL) || value.equals(EnableResolve.ResolveStrategy.ARGUMENTS);
     }
 
     protected boolean supportsParameter(HttpServletRequest request, MethodParameter parameter) {
@@ -75,7 +75,7 @@ public class GlobalArgumentResolver implements HandlerMethodArgumentResolver {
             return false;
         }
         RequestDataWrapper requestDataWrapper = (RequestDataWrapper) request.getAttribute(REQUEST_DATA_KEY);
-        return requestDataWrapper != null && requestDataWrapper.isCanRead();
+        return Objects.nonNull(requestDataWrapper) && requestDataWrapper.isCanRead();
     }
 
     @Override
