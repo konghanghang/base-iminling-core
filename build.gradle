@@ -1,19 +1,30 @@
-/*plugins {
-    *//*id("org.springframework.boot") version "2.3.5.RELEASE"*//*
-    id("io.spring.dependency-management") version "1.0.9.RELEASE"
-    kotlin("jvm") version "1.5.10"
-    `java-library`
-}
-
-dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
+plugins {
+    /*id("org.springframework.boot") version "2.3.5.RELEASE"*/
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'java-library'
 }
 
 ext {
-    set("spring.cloud-version", "Hoxton.SR9")
+    cloudVersion = 'Hoxton.SR9'
+    bootVersion = '2.3.5.RELEASE'
 }
 
+/*dependencyManagement {
+    imports {
+        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE'
+    }
+    dependencies {
+        dependency("org.projectlombok:lombok:1.16.20")
+    }
+}*/
+
 allprojects {
+
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'java-library'
+
     group = "com.iminling"
     version = "2.2.0-SNAPSHOT"
 
@@ -24,4 +35,13 @@ allprojects {
         mavenLocal()
     }
 
-}*/
+    dependencies {
+        api platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE")
+        api platform("org.jetbrains.kotlin:kotlin-bom")
+        compileOnly("org.projectlombok:lombok:1.16.20")
+        annotationProcessor("org.projectlombok:lombok:1.16.20")
+        testCompileOnly("org.projectlombok:lombok:1.16.20")
+        testAnnotationProcessor("org.projectlombok:lombok:1.16.20")
+    }
+
+}
