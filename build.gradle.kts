@@ -28,17 +28,17 @@ configurations {
     }
 }
 
-repositories {
-    maven {
-        setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
-    }
-    mavenCentral()
-}
-
 allprojects {
 
     group = "com.iminling"
     version = "2.2.0-SNAPSHOT"
+
+    repositories {
+        maven {
+            setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
+        }
+        mavenCentral()
+    }
 
 }
 
@@ -48,13 +48,6 @@ subprojects {
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
-    }
-
-    repositories {
-        maven {
-            setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
-        }
-        mavenCentral()
     }
 
     dependencies {
