@@ -1,26 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    /*id("org.springframework.boot") version "2.3.5.RELEASE"*/
-    id("io.spring.dependency-management") version "1.0.9.RELEASE"
+    // https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle/#introduction
+    // id("org.springframework.boot") version "2.3.5.RELEASE" apply false
+    // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
+    id("io.spring.dependency-management") version "1.0.11.RELEASE"
     kotlin("jvm") version "1.4.30"
     kotlin("plugin.spring") version "1.4.30"
     `java-library`
 }
 
-/*ext {
-    cloudVersion = "Hoxton.SR9"
-    bootVersion = "2.3.5.RELEASE"
-}
-
-dependencyManagement {
-    imports {
-        mavenBom 'org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE'
-    }
-    dependencies {
-        dependency("org.projectlombok:lombok:1.16.20")
-    }
-}*/
+ext["cloudVersion"] = "Hoxton.SR9"
+ext["bootVersion"] = "2.3.5.RELEASE"
 
 configurations {
     compileOnly {
@@ -29,6 +20,10 @@ configurations {
 }
 
 allprojects {
+
+    apply {
+        plugin("io.spring.dependency-management")
+    }
 
     group = "com.iminling"
     version = "2.2.0-SNAPSHOT"
@@ -40,18 +35,26 @@ allprojects {
         mavenCentral()
     }
 
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE")
+        }
+        dependencies {
+            dependency("org.projectlombok:lombok:1.16.20")
+        }
+    }
+
 }
 
 subprojects {
     apply{
-        plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
     }
 
     dependencies {
-        api(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
+        //api(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
         api(platform("org.jetbrains.kotlin:kotlin-bom"))
         compileOnly("org.projectlombok:lombok:1.16.20")
         annotationProcessor("org.projectlombok:lombok:1.16.20")
