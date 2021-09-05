@@ -67,8 +67,10 @@ allprojects {
                 val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots")
                 url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
                 credentials {
-                    username = System.getenv("SONATYPE_NEXUS_USERNAME")
-                    password = System.getenv("SONATYPE_NEXUS_PASSWORD")
+                    // System.getenv放在.bash_profile中
+                    // System.getProperty可以放在命令行也可以放在gradle.properties中
+                    username = System.getProperty("SONATYPE_NEXUS_USERNAME")
+                    password = System.getProperty("SONATYPE_NEXUS_PASSWORD")
                 }
             }
         }
