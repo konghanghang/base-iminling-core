@@ -9,6 +9,7 @@ plugins {
     // java
     kotlin("jvm") version "1.4.30"
     kotlin("plugin.spring") version "1.4.30"
+    id("com.gorylenko.gradle-git-properties") version "2.3.1"
     `java-library`
     `maven-publish`
     signing
@@ -51,6 +52,21 @@ allprojects {
     }*/
 
 }
+subprojects {
+
+    apply{
+        plugin("com.gorylenko.gradle-git-properties")
+    }
+
+    gitProperties {
+        configure<com.gorylenko.GitPropertiesPluginExtension> {
+            dateFormat = "yyyy-MM-dd HH:mm:ss"
+            dateFormatTimeZone = "Asia/Shanghai"
+        }
+    }
+
+}
+
 
 subprojects {
     apply{
