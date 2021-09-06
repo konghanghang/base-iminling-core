@@ -63,7 +63,7 @@ subprojects {
     }
 
     group = "com.iminling"
-    version = "2.2.1-SNAPSHOT"
+    version = "2.2.2-SNAPSHOT"
 
     dependencies {
         api(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
@@ -166,5 +166,10 @@ subprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
+    }
+
+    // 解决打包后生成.module文件，导致发布到中央仓库时只上传了.module文件没有上传jar文件
+    tasks.withType<GenerateModuleMetadata> {
+        enabled = false
     }
 }
