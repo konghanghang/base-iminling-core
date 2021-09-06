@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 plugins {
     // https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle/#introduction
@@ -52,30 +54,13 @@ allprojects {
     }*/
 
 }
-subprojects {
-
-    apply{
-        plugin("com.gorylenko.gradle-git-properties")
-    }
-
-    gitProperties {
-        configure<com.gorylenko.GitPropertiesPluginExtension> {
-            dateFormat = "yyyy-MM-dd HH:mm:ss"
-            dateFormatTimeZone = "Asia/Shanghai"
-        }
-    }
-
-}
-
 
 subprojects {
-    apply{
+    apply {
         // plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
-        plugin("maven-publish")
-        plugin("signing")
     }
 
     group = "com.iminling"
@@ -90,17 +75,57 @@ subprojects {
         testAnnotationProcessor("org.projectlombok:lombok:1.16.20")
     }
 
-    java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-        withJavadocJar()
-        withSourcesJar()
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 
     tasks.jar {
         manifest {
             attributes("Created-By" to "Gradle 7.1")
         }
+    }
+
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = "8"
+        }
+    }
+}
+
+subprojects {
+
+    apply{
+        plugin("com.gorylenko.gradle-git-properties")
+    }
+
+    gitProperties {
+        val time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        configure<com.gorylenko.GitPropertiesPluginExtension> {
+            dateFormat = "yyyy-MM-dd HH:mm:ss"
+            dateFormatTimeZone = "Asia/Shanghai"
+            customProperties = mapOf("git.build.time" to time)
+        }
+    }
+
+}
+
+
+subprojects {
+    apply{
+        plugin("maven-publish")
+        plugin("signing")
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        withJavadocJar()
+        withSourcesJar()
     }
 
     publishing {
@@ -173,21 +198,6 @@ subprojects {
             }
             (options as StandardJavadocDocletOptions).encoding("UTF-8")
         }
-    }
-
-    tasks.withType<KotlinCompile> {
-         kotlinOptions {
-             freeCompilerArgs = listOf("-Xjsr305=strict")
-             jvmTarget = "8"
-         }
-    }
-
-    tasks.withType<JavaCompile> {
-        options.encoding = "UTF-8"
-    }
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
     }
 
     // 解决打包后生成.module文件，导致发布到中央仓库时只上传了.module文件没有上传jar文件
