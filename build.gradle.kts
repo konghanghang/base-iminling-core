@@ -97,6 +97,12 @@ subprojects {
         withSourcesJar()
     }
 
+    tasks.jar {
+        manifest {
+            attributes("Created-By" to "Gradle 7.1")
+        }
+    }
+
     publishing {
         publications {
             create<MavenPublication>("mavenJava") {
