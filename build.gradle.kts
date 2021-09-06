@@ -5,6 +5,8 @@ plugins {
     // id("org.springframework.boot") version "2.3.5.RELEASE" apply false
     // https://docs.spring.io/dependency-management-plugin/docs/current/reference/html/
     // id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    // https://docs.gradle.org/6.0/userguide/java_plugin.html
+    // java
     kotlin("jvm") version "1.4.30"
     kotlin("plugin.spring") version "1.4.30"
     `java-library`
@@ -32,15 +34,6 @@ configurations {
 
 allprojects {
 
-    apply {
-        // plugin("io.spring.dependency-management")
-        plugin("maven-publish")
-        plugin("signing")
-    }
-
-    group = "com.iminling"
-    version = "2.2.1-SNAPSHOT"
-
     repositories {
         maven {
             setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
@@ -57,33 +50,20 @@ allprojects {
         }
     }*/
 
-    publishing {
-        repositories {
-            maven {
-                name = "mavenCentral"
-                // change URLs to point to your repos, e.g. http://my.org/repo
-                // val releasesRepoUrl = uri(layout.buildDirectory.dir("repos/releases"))
-                val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots")
-                url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-                credentials {
-                    // System.getenv放在.bash_profile中
-                    // System.getProperty可以放在命令行也可以放在gradle.properties中
-                    username = System.getProperty("SONATYPE_NEXUS_USERNAME")
-                    password = System.getProperty("SONATYPE_NEXUS_PASSWORD")
-                }
-            }
-        }
-    }
-
 }
 
 subprojects {
     apply{
+        // plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
+        plugin("maven-publish")
+        plugin("signing")
     }
+
+    group = "com.iminling"
+    version = "2.2.1-SNAPSHOT"
 
     dependencies {
         api(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
@@ -140,6 +120,23 @@ subprojects {
                         developerConnection.set("scm:git:ssh://github.com/konghanghang/base-iminling-core.git")
                         url.set("https://github.com/konghanghang/base-iminling-core")
                     }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = "mavenCentral"
+                // change URLs to point to your repos, e.g. http://my.org/repo
+                // val releasesRepoUrl = uri(layout.buildDirectory.dir("repos/releases"))
+                val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots")
+                url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+                credentials {
+                    // System.getenv放在.bash_profile中
+                    // System.getProperty可以放在命令行也可以放在gradle.properties中
+                    username = System.getProperty("SONATYPE_NEXUS_USERNAME")
+                    password = System.getProperty("SONATYPE_NEXUS_PASSWORD")
                 }
             }
         }
