@@ -95,6 +95,8 @@ subprojects {
     }
 
     java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
         withJavadocJar()
         withSourcesJar()
     }
@@ -150,6 +152,7 @@ subprojects {
             if (JavaVersion.current().isJava9Compatible) {
                 (options as StandardJavadocDocletOptions).addBooleanOption("html5", true)
             }
+            (options as StandardJavadocDocletOptions).encoding("UTF-8")
         }
     }
 
@@ -158,6 +161,10 @@ subprojects {
              freeCompilerArgs = listOf("-Xjsr305=strict")
              jvmTarget = "8"
          }
+    }
+
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
     }
 
     tasks.withType<Test> {
