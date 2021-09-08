@@ -9,9 +9,11 @@ plugins {
     // id("io.spring.dependency-management") version "1.0.11.RELEASE"
     // https://docs.gradle.org/6.0/userguide/java_plugin.html
     // java
-    kotlin("jvm") version "1.4.30"
-    kotlin("plugin.spring") version "1.4.30"
+    kotlin("jvm") version "1.5.30"
+    kotlin("plugin.spring") version "1.5.30"
     id("com.gorylenko.gradle-git-properties") version "2.3.1"
+    // 解决kotlin无法识别java使用lombok的@getter等方法 https://kotlinlang.org/docs/lombok.html#gradle
+    kotlin("plugin.lombok") version "1.5.30"
     `java-library`
     `maven-publish`
     signing
@@ -61,6 +63,7 @@ subprojects {
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
+        plugin("org.jetbrains.kotlin.plugin.lombok")
     }
 
     group = "com.iminling"
@@ -92,7 +95,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "8"
+            jvmTarget = "1.8"
         }
     }
 }
