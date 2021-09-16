@@ -9,9 +9,9 @@ import java.util.Map;
 /**
  * @author yslao@outlook.com
  */
-public class CustomWrapper extends MapWrapper {
+public class CustomizeWrapper extends MapWrapper {
 
-    public CustomWrapper(MetaObject metaObject, Map<String, Object> map) {
+    public CustomizeWrapper(MetaObject metaObject, Map<String, Object> map) {
         super(metaObject, map);
     }
 

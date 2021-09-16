@@ -6,6 +6,10 @@ import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -13,26 +17,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-@Configuration
 @ConditionalOnClass(MybatisPlusAutoConfiguration.class)
-public class MybatisConfig implements ApplicationContextAware {
+public class CustomizeMybatisConfig implements ApplicationContextAware {
 
     private static final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
     private ApplicationContext applicationContext;
     private final MybatisPlusProperties mybatisPlusProperties;
 
-    public MybatisConfig(MybatisPlusProperties mybatisPlusProperties) {
+    public CustomizeMybatisConfig(MybatisPlusProperties mybatisPlusProperties) {
         this.mybatisPlusProperties = mybatisPlusProperties;
     }
 

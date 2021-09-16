@@ -7,7 +7,8 @@ import com.iminling.core.config.argument.DefaultRequestDataReader;
 import com.iminling.core.config.argument.GlobalArgumentBeanPostProcessor;
 import com.iminling.core.config.argument.GlobalArgumentResolverConfig;
 import com.iminling.core.config.exception.GlobalExceptionHandler;
-import com.iminling.core.config.mybatis.MybatisConfig;
+import com.iminling.core.config.jpa.CustomizeJpaConfiguration;
+import com.iminling.core.config.mybatis.CustomizeMybatisConfig;
 import com.iminling.core.config.value.GlobalReturnValueHandler;
 import com.iminling.core.filter.AuthFilter;
 import com.iminling.core.filter.CustomizeGlobalFilter;
@@ -27,7 +28,7 @@ import java.util.List;
  * @author yslao@outlook.com
  * @since 2021/2/19
  */
-@Import({MybatisConfig.class})
+@Import({CustomizeMybatisConfig.class, CustomizeJpaConfiguration.class})
 public class CoreBeanAutoConfiguration implements WebMvcConfigurer {
 
     /*@Bean
