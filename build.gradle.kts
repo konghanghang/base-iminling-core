@@ -83,8 +83,14 @@ subprojects {
     }
 
     tasks.jar {
+        dependsOn(tasks.withType(GenerateMavenPom::class))
         manifest {
             attributes("Created-By" to "Gradle 7.1")
+        }
+        into("META-INF") {
+            from("$buildDir/publications/mavenJava")
+            exclude("*.asc")
+            rename { it.replace("pom-default.xml", "pom.xml") }
         }
     }
 
@@ -170,6 +176,32 @@ subprojects {
                         developerConnection.set("scm:git:ssh://github.com/konghanghang/base-iminling-core.git")
                         url.set("https://github.com/konghanghang/base-iminling-core")
                     }
+                    /*withXml {
+                        var dependencyNode = asNode().appendNode("dependency")
+                        var attribute = asElement().getAttribute("dependencies")
+                        println(attribute)
+                        var compileOnly = configurations.compileOnly
+                        var api = configurations.api
+                        var testImplementation = configurations.testImplementation
+                        compileOnly.get().allDependencies.forEach {
+                            dependencyNode.appendNode("groupId", it.group)
+                            dependencyNode.appendNode("artifactId", it.name)
+                            dependencyNode.appendNode("version", it.version)
+                            dependencyNode.appendNode("scope", "optional")
+                        }
+                        api.get().allDependencies.forEach {
+                            dependencyNode.appendNode("groupId", it.group)
+                            dependencyNode.appendNode("artifactId", it.name)
+                            dependencyNode.appendNode("version", it.version)
+                            dependencyNode.appendNode("scope", "compile")
+                        }
+                        testImplementation.get().allDependencies.forEach {
+                            dependencyNode.appendNode("groupId", it.group)
+                            dependencyNode.appendNode("artifactId", it.name)
+                            dependencyNode.appendNode("version", it.version)
+                            dependencyNode.appendNode("scope", "test")
+                        }
+                    }*/
                 }
             }
         }
