@@ -1,10 +1,15 @@
 package com.iminling.core.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -39,6 +44,26 @@ public class CustomMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         // resolvers.add(new RequestArgumentResolver(objectMapper));
+    }
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.ignoreAcceptHeader(true)
+                .useRegisteredExtensionsOnly(true)
+                .favorParameter(true)
+                .defaultContentType(MediaType.ALL)
+                .mediaType(MimeTypeUtils.ALL_VALUE, MediaType.ALL);
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        for (int i = 0; i < converters.size(); i++) {
+            HttpMessageConverter<?> httpMessageConverter = converters.get(i);
+            if (httpMessageConverter instanceof MappingJackson2HttpMessageConverter) {
+                converters.add(0, httpMessageConverter);
+                break;
+            }
+        }
     }
 
     @Bean

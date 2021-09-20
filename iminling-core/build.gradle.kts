@@ -1,6 +1,9 @@
 dependencies {
     api(project(":iminling-common"))
     compileOnly("com.baomidou:mybatis-plus-boot-starter:3.4.0")
+    compileOnly("com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery")
+    compileOnly("com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config")
+    compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
     compileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
     compileOnly("com.querydsl:querydsl-jpa")
     // annotationProcessor("org.springframework.boot:spring-boot-starter-actuator")

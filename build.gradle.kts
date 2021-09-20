@@ -19,9 +19,6 @@ plugins {
     signing
 }
 
-ext["cloudVersion"] = "Hoxton.SR9"
-ext["bootVersion"] = "2.3.5.RELEASE"
-
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
@@ -71,6 +68,8 @@ subprojects {
 
     dependencies {
         api(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
+        api(platform("org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR9"))
+        api(platform("com.alibaba.cloud:spring-cloud-alibaba-dependencies:2.1.0.RELEASE"))
         api(platform("org.jetbrains.kotlin:kotlin-bom"))
         compileOnly("org.projectlombok:lombok:1.16.20")
         annotationProcessor("org.projectlombok:lombok:1.16.20")
@@ -176,32 +175,6 @@ subprojects {
                         developerConnection.set("scm:git:ssh://github.com/konghanghang/base-iminling-core.git")
                         url.set("https://github.com/konghanghang/base-iminling-core")
                     }
-                    /*withXml {
-                        var dependencyNode = asNode().appendNode("dependency")
-                        var attribute = asElement().getAttribute("dependencies")
-                        println(attribute)
-                        var compileOnly = configurations.compileOnly
-                        var api = configurations.api
-                        var testImplementation = configurations.testImplementation
-                        compileOnly.get().allDependencies.forEach {
-                            dependencyNode.appendNode("groupId", it.group)
-                            dependencyNode.appendNode("artifactId", it.name)
-                            dependencyNode.appendNode("version", it.version)
-                            dependencyNode.appendNode("scope", "optional")
-                        }
-                        api.get().allDependencies.forEach {
-                            dependencyNode.appendNode("groupId", it.group)
-                            dependencyNode.appendNode("artifactId", it.name)
-                            dependencyNode.appendNode("version", it.version)
-                            dependencyNode.appendNode("scope", "compile")
-                        }
-                        testImplementation.get().allDependencies.forEach {
-                            dependencyNode.appendNode("groupId", it.group)
-                            dependencyNode.appendNode("artifactId", it.name)
-                            dependencyNode.appendNode("version", it.version)
-                            dependencyNode.appendNode("scope", "test")
-                        }
-                    }*/
                 }
             }
         }

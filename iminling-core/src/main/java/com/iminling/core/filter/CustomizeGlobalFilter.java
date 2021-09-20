@@ -4,6 +4,8 @@ import com.iminling.core.util.IpUtils;
 import com.iminling.core.util.ThreadContext;
 import com.iminling.model.core.LogRecord;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.springframework.core.Ordered;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
+import org.springframework.web.util.WebUtils;
 
 /**
  * 定义filter，包装HttpServletRequest和HttpServletResponse
@@ -51,7 +54,11 @@ public class CustomizeGlobalFilter extends OncePerRequestFilter implements Order
             logger.error(e.getMessage(), e);
             throw e;
         } finally {
-
+            ContentCachingResponseWrapper responseWrapper = WebUtils.getNativeResponse(responseToUse, ContentCachingResponseWrapper.class);
+            if (Objects.nonNull(responseWrapper)) {
+                // Do not forget this line after reading response content or actual response will be empty!
+                responseWrapper.copyBodyToResponse();
+            }
         }
     }
 

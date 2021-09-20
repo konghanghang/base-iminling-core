@@ -42,10 +42,29 @@ public class JsonUtil {
         OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // 允许备注
         OBJECT_MAPPER.enable(JsonParser.Feature.ALLOW_COMMENTS);
-        // objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
         // 处理枚举类型
         OBJECT_MAPPER.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
 
+        OBJECT_MAPPER.registerModule(createJavaTimeModule());
+    }
+
+    public static XmlMapper createXmlMapper() {
+        XmlMapper xmlMapper = new XmlMapper();
+        xmlMapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
+        xmlMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+        xmlMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        xmlMapper.enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+        xmlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        xmlMapper.registerModule(createJavaTimeModule());
+        xmlMapper.enable(MapperFeature.USE_STD_BEAN_NAMING);
+        // 是否添加<?xml version='1.0' encoding='UTF-8'?>
+        // xmlMapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
+        return xmlMapper;
+    }
+
+    private static JavaTimeModule createJavaTimeModule() {
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_TIME_FORMAT)));
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_FORMAT)));
@@ -53,23 +72,7 @@ public class JsonUtil {
         javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_TIME_FORMAT)));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_FORMAT)));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_TIME_FORMAT)));
-        OBJECT_MAPPER.registerModule(javaTimeModule);
-    }
-
-    public static XmlMapper createXmlMapper() {
-        XmlMapper xmlMapper = new XmlMapper();
-        xmlMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-        xmlMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
-        xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        xmlMapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS, true);
-        xmlMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        xmlMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        xmlMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        xmlMapper.registerModule(new JavaTimeModule());
-        xmlMapper.enable(MapperFeature.USE_STD_BEAN_NAMING);
-        // 是否添加<?xml version='1.0' encoding='UTF-8'?>
-        // xmlMapper.enable(Feature.WRITE_XML_DECLARATION);
-        return xmlMapper;
+        return javaTimeModule;
     }
 
     /**
@@ -242,6 +245,13 @@ public class JsonUtil {
         return OBJECT_MAPPER.convertValue(pojo, javaType);
     }
 
+    /**
+     * xml转对象
+     * @param xmlStr xml字符串
+     * @param clazz 对象
+     * @param <T>   泛型
+     * @return  对象
+     */
     public static <T> T xml2Obj(String xmlStr, Class<T> clazz) {
         try {
             return XML_MAPPER.readValue(xmlStr, clazz);
@@ -250,9 +260,33 @@ public class JsonUtil {
         }
     }
 
+    /**
+     * 对象转xml
+     * @param obj   对象
+     * @param <T>   泛型
+     * @return  xml字符串
+     */
     public static <T> String Obj2xml(T obj) {
         try {
             return XML_MAPPER.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("对象转xml异常,xml。", e);
+        }
+    }
+
+    /**
+     * map转xml，自定义rootName
+     * @param obj   map对象
+     * @param rootName  根:xml
+     * @param <T>   泛型
+     * @return string
+     */
+    public static <T> String map2xml(T obj, String rootName) {
+        try {
+            // todo 如何设置CDATA
+            return XML_MAPPER.writer()
+                    .withRootName(rootName)
+                    .writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("对象转xml异常,xml。", e);
         }

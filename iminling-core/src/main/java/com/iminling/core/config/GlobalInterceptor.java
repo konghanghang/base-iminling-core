@@ -16,17 +16,6 @@ import com.iminling.core.util.ThreadContext;
 import com.iminling.model.core.ClientInfo;
 import com.iminling.model.core.LogRecord;
 import com.iminling.model.exception.AuthorizeException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +28,18 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -156,8 +157,6 @@ public class GlobalInterceptor implements HandlerInterceptor {
                 String result = new String(buf, 0, buf.length, responseWrapper.getCharacterEncoding());
                 log.info("url:{}, result:{}", request.getRequestURI(), result);
             }
-            // Do not forget this line after reading response content or actual response will be empty!
-            responseWrapper.copyBodyToResponse();
         }
     }
 
