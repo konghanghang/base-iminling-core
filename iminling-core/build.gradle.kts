@@ -13,4 +13,5 @@ dependencies {
     api("org.aspectj:aspectjweaver:1.9.0")
     api("cglib:cglib:3.1")
     api("com.auth0:java-jwt:3.3.0")
+    api("com.github.xiaoymin:knife4j-spring-boot-starter:2.0.7")
 }
