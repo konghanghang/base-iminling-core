@@ -24,6 +24,7 @@ import org.springframework.core.env.ConfigurableEnvironment
 import springfox.documentation.builders.ApiInfoBuilder
 import springfox.documentation.builders.PathSelectors
 import springfox.documentation.builders.RequestHandlerSelectors
+import springfox.documentation.service.Contact
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc
@@ -120,18 +121,28 @@ class CoreBeanAutoConfiguration {
      */
     @Bean(value = ["defaultApi2"])
     fun defaultApi2(knife4jApiInfoProperties: Knife4jApiInfoProperties): Docket {
+        /*var selectors = mutableListOf<Predicate<RequestHandler>>()
+        knife4jApiInfoProperties.packages.forEach { selectors.add(RequestHandlerSelectors.basePackage(it)) }*/
         return Docket(DocumentationType.SWAGGER_2)
             .apiInfo(
                 ApiInfoBuilder() //.title("swagger-bootstrap-ui-demo RESTful APIs")
-                    .description("# swagger-bootstrap-ui-demo RESTful APIs")
-                    .termsOfServiceUrl("http://www.xx.com/")
-                    .contact("xx@qq.com")
-                    .version("1.0")
+                    .description(knife4jApiInfoProperties.description)
+                    .termsOfServiceUrl(knife4jApiInfoProperties.serviceUrl)
+                    .contact(Contact(knife4jApiInfoProperties.contactName, knife4jApiInfoProperties.contactUrl, knife4jApiInfoProperties.contactEmail))
+                    .version(knife4jApiInfoProperties.version)
                     .build()
             ) //分组名称
-            .groupName("2.X版本")
+            .groupName(knife4jApiInfoProperties.groupName)
+            .enable(knife4jApiInfoProperties.enable)
             .select() //这里指定Controller扫描包路径
-            .apis(RequestHandlerSelectors.basePackage("com.github.xiaoymin.knife4j.controller"))
+            .apis(RequestHandlerSelectors.basePackage(knife4jApiInfoProperties.basePackage))
+            /*.apis {
+                var clazz = it.declaringClass()
+                if (clazz == null) false else {
+                    ClassUtils.getPackageName(clazz).startsWith("")
+                }
+            }*/
+            //.apis(Predicates.or(selectors))
             .paths(PathSelectors.any())
             .build()
     }

@@ -1,5 +1,6 @@
 package com.iminling.core.config.exception
 
+import com.google.common.base.Joiner
 import com.iminling.common.json.JsonUtil
 import com.iminling.model.common.MessageCode
 import com.iminling.model.common.ResultModel
@@ -39,8 +40,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun methodArgumentNotValidExceptionHandler(e: MethodArgumentNotValidException): ResultModel<*> {
-        val fieldErrors = e.bindingResult.fieldErrors
-        return ResultModel.isFail(fieldErrors[0].defaultMessage)
+        val fieldErrors = e.bindingResult.fieldErrors.map { it.defaultMessage }
+        return ResultModel.isFail(Joiner.on("、").join(fieldErrors))
     }
 
     @ExceptionHandler(NoHandlerFoundException::class)
