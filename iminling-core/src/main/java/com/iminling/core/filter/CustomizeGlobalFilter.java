@@ -1,20 +1,21 @@
 package com.iminling.core.filter;
 
 import com.iminling.core.util.IpUtils;
+import com.iminling.core.util.LogUtils;
 import com.iminling.core.util.ThreadContext;
 import com.iminling.model.core.LogRecord;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * 定义filter，包装HttpServletRequest和HttpServletResponse
@@ -33,20 +34,20 @@ public class CustomizeGlobalFilter extends OncePerRequestFilter implements Order
         boolean isFirstRequest = !isAsyncDispatch(request);
         HttpServletRequest requestToUse = request;
         HttpServletResponse responseToUse = response;
-        initLogRecord(request);
         if (!isFirstRequest || (request instanceof ContentCachingRequestWrapper)) {
             return;
         }
-        if (!"PUT".equalsIgnoreCase(request.getMethod()) && !"POST".equalsIgnoreCase(request.getMethod())
-            && !"DELETE".equalsIgnoreCase(request.getMethod()) && !"GET".equalsIgnoreCase(request.getMethod())) {
-            return;
-        }
-
-        if (isFirstRequest && !(request instanceof ContentCachingRequestWrapper)) {
-            requestToUse = new ContentCachingRequestWrapper(request, request.getContentLength()>=0 ? request.getContentLength() : 1024);
-        }
-        if (!(response instanceof ContentCachingResponseWrapper)) {
-            responseToUse = new ContentCachingResponseWrapper(response);
+        boolean flag = false;
+        if (!LogUtils.Companion.containsMethod(request.getMethod())
+                || LogUtils.Companion.canLog(request.getRequestURI())) {
+            flag = true;
+            initLogRecord(request);
+            if (isFirstRequest && !(request instanceof ContentCachingRequestWrapper)) {
+                requestToUse = new ContentCachingRequestWrapper(request, request.getContentLength()>=0 ? request.getContentLength() : 1024);
+            }
+            if (!(response instanceof ContentCachingResponseWrapper)) {
+                responseToUse = new ContentCachingResponseWrapper(response);
+            }
         }
         try {
             filterChain.doFilter(requestToUse, responseToUse);
@@ -54,10 +55,12 @@ public class CustomizeGlobalFilter extends OncePerRequestFilter implements Order
             logger.error(e.getMessage(), e);
             throw e;
         } finally {
-            ContentCachingResponseWrapper responseWrapper = WebUtils.getNativeResponse(responseToUse, ContentCachingResponseWrapper.class);
-            if (Objects.nonNull(responseWrapper)) {
-                // Do not forget this line after reading response content or actual response will be empty!
-                responseWrapper.copyBodyToResponse();
+            if (flag) {
+                ContentCachingResponseWrapper responseWrapper = WebUtils.getNativeResponse(responseToUse, ContentCachingResponseWrapper.class);
+                if (Objects.nonNull(responseWrapper)) {
+                    // Do not forget this line after reading response content or actual response will be empty!
+                    responseWrapper.copyBodyToResponse();
+                }
             }
         }
     }

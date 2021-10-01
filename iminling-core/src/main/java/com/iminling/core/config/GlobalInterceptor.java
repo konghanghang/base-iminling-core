@@ -11,6 +11,7 @@ import com.iminling.core.config.argument.RequestDataWrapper;
 import com.iminling.core.filter.Filter;
 import com.iminling.core.service.ILogService;
 import com.iminling.core.util.IpUtils;
+import com.iminling.core.util.LogUtils;
 import com.iminling.core.util.ResponseWriter;
 import com.iminling.core.util.ThreadContext;
 import com.iminling.model.core.ClientInfo;
@@ -69,8 +70,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
             throws Exception {
         // 过滤非controller的请求
         if (!handler.getClass().isAssignableFrom(HandlerMethod.class)
-                || "/error".equalsIgnoreCase(request.getRequestURI())
-                || "/favicon.ico".equalsIgnoreCase(request.getRequestURI())) {
+                || LogUtils.Companion.canLog(request.getRequestURI())) {
             return true;
         }
         HandlerMethod handlerMethod = (HandlerMethod) handler;
@@ -124,6 +124,9 @@ public class GlobalInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
                                 @Nullable Exception ex) throws Exception {
+        if (!handler.getClass().isAssignableFrom(HandlerMethod.class) || LogUtils.Companion.canLog(request.getRequestURI())) {
+            return;
+        }
         boolean enableArgumentLog = environment.getProperty(ApplicationConstant.KEY_LOGGER_ARGUMENTS, Boolean.class, false);
         if (enableArgumentLog) {
             handlerArgument(request);
@@ -174,9 +177,9 @@ public class GlobalInterceptor implements HandlerInterceptor {
                 String requestBody = new String(buf, 0, buf.length, requestWrapper.getCharacterEncoding());
                 ThreadContext.getLogRecord().setBody(requestBody);
             }
-            Map<String, String[]> parameterMap = request.getParameterMap();
-            ThreadContext.getLogRecord().setParam(JsonUtil.obj2Str(parameterMap));
         }
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        ThreadContext.getLogRecord().setParam(JsonUtil.obj2Str(parameterMap));
         log.info("url:{}, queryString:{}, body：{}", request.getRequestURI(), ThreadContext.getLogRecord().getParam(), ThreadContext.getLogRecord().getBody());
     }
 
