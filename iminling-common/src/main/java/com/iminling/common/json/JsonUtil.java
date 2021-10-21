@@ -276,6 +276,7 @@ public class JsonUtil {
 
     /**
      * map转xml，自定义rootName
+     * map内容中的特殊字符会被jackson转义，所以无需cdata
      * @param obj   map对象
      * @param rootName  根:xml
      * @param <T>   泛型
@@ -283,7 +284,6 @@ public class JsonUtil {
      */
     public static <T> String map2xml(T obj, String rootName) {
         try {
-            // todo 如何设置CDATA
             return XML_MAPPER.writer()
                     .withRootName(rootName)
                     .writeValueAsString(obj);
