@@ -7,11 +7,10 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
     compileOnly("com.querydsl:querydsl-jpa")
     // annotationProcessor("org.springframework.boot:spring-boot-starter-actuator")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
     api("org.springframework.boot:spring-boot-starter-web")
+    api("org.springframework.boot:spring-boot-starter-aop")
     api("org.hibernate.validator:hibernate-validator:6.1.6.Final")
-    api("org.aspectj:aspectjweaver:1.9.0")
-    api("cglib:cglib:3.1")
     api("com.auth0:java-jwt:3.3.0")
     api("com.github.xiaoymin:knife4j-spring-boot-starter:2.0.7")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.6.3")
 }

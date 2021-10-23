@@ -24,7 +24,7 @@ class LogUtils {
         private val HTTP_METHOD = mutableListOf("PUT", "POST", "DELETE", "GET")
 
         private val LOG_BODY_MEDIA_TYPE = listOf(
-            MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON_UTF8,
+            MediaType.APPLICATION_JSON,
             MediaType.APPLICATION_FORM_URLENCODED, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN, MediaType.TEXT_XML
         )
 

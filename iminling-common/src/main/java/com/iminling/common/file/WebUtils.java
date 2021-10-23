@@ -1,11 +1,10 @@
 package com.iminling.common.file;
 
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
+import java.nio.charset.StandardCharsets;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-
-import java.nio.charset.StandardCharsets;
 
 public class WebUtils {
 
@@ -30,7 +29,7 @@ public class WebUtils {
      */
     private static HttpHeaders createContentDispositionHttpHeaders(String type, String fileName) {
         ContentDisposition.Builder builder = ContentDisposition.builder(type);
-        if (StringUtils.isNotEmpty(fileName)) {
+        if (StrUtil.isNotEmpty(fileName)) {
             builder.filename(new String(fileName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
         }
         ContentDisposition contentDisposition = builder.build();

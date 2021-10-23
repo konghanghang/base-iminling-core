@@ -1,9 +1,8 @@
 package com.iminling.common.crypto;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-
+import cn.hutool.core.util.StrUtil;
 import java.nio.charset.StandardCharsets;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * @author yslao@outlook.com
@@ -79,7 +78,7 @@ public class Base64Utils {
      * @return 加密后的字符串
      */
     public static String encode(String s) {
-        if (StringUtils.isBlank(s)) {
+        if (StrUtil.isBlank(s)) {
             return null;
         }
         return Base64.encodeBase64String(s.getBytes(StandardCharsets.UTF_8));
@@ -91,7 +90,7 @@ public class Base64Utils {
      * @return 解密后的字符串
      */
     public static String decode(String s) {
-        if (StringUtils.isBlank(s)){
+        if (StrUtil.isBlank(s)){
             return null;
         }
         return new String(Base64.decodeBase64(s), StandardCharsets.UTF_8);

@@ -1,6 +1,14 @@
 package com.iminling.common.http;
 
-import org.apache.commons.lang3.StringUtils;
+import cn.hutool.core.util.StrUtil;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.*;
+import javax.net.ssl.SSLContext;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -24,15 +32,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-
-import javax.net.ssl.SSLContext;
-import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.*;
 
 /**
  * see -http://blog.csdn.net/wangpeng047/article/details/19624529
@@ -69,7 +68,7 @@ public class HttpClientUtils {
     private static String buildUrl(String host, String path, Map<String, String> params) throws UnsupportedEncodingException {
         StringBuilder sbUrl = new StringBuilder();
         sbUrl.append(host);
-        if (!StringUtils.isBlank(path)) {
+        if (!StrUtil.isBlank(path)) {
             sbUrl.append(path);
         }
         if (null != params) {
@@ -78,12 +77,12 @@ public class HttpClientUtils {
                 if (0 < sbQuery.length()) {
                     sbQuery.append("&");
                 }
-                if (StringUtils.isBlank(query.getKey()) && !StringUtils.isBlank(query.getValue())) {
+                if (StrUtil.isBlank(query.getKey()) && !StrUtil.isBlank(query.getValue())) {
                     sbQuery.append(query.getValue());
                 }
-                if (!StringUtils.isBlank(query.getKey())) {
+                if (!StrUtil.isBlank(query.getKey())) {
                     sbQuery.append(query.getKey());
-                    if (!StringUtils.isBlank(query.getValue())) {
+                    if (!StrUtil.isBlank(query.getValue())) {
                         sbQuery.append("=");
                         sbQuery.append(URLEncoder.encode(query.getValue(), "utf-8"));
                     }
