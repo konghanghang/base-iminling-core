@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
@@ -13,6 +14,10 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.iminling.common.date.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
@@ -20,9 +25,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 public class JsonUtil {
 
@@ -44,6 +46,8 @@ public class JsonUtil {
         // 处理枚举类型
         OBJECT_MAPPER.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
 
+        // 会导致所有的对象返回的字符串都不带引号
+        // OBJECT_MAPPER.registerModule(handleStringModule());
         OBJECT_MAPPER.registerModule(createJavaTimeModule());
     }
 
@@ -72,6 +76,13 @@ public class JsonUtil {
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_DATE_FORMAT)));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DateUtils.DEFAULT_TIME_FORMAT)));
         return javaTimeModule;
+    }
+
+    private static SimpleModule handleStringModule() {
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(String.class, new StringSerializer());
+        simpleModule.addDeserializer(String.class, new StringDeserializer());
+        return simpleModule;
     }
 
     /**

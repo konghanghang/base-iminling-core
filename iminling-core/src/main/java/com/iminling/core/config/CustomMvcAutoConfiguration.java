@@ -1,10 +1,13 @@
 package com.iminling.core.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -14,6 +17,9 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -57,13 +63,25 @@ public class CustomMvcAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        for (int i = 0; i < converters.size(); i++) {
-            HttpMessageConverter<?> httpMessageConverter = converters.get(i);
-            if (httpMessageConverter instanceof MappingJackson2HttpMessageConverter) {
-                converters.add(0, httpMessageConverter);
-                break;
+        converters.add(0, new MappingJackson2HttpMessageConverter() {
+            /**
+             * 重写Jackson消息转换器的writeInternal方法
+             * SpringMVC选定了具体的消息转换类型后,会调用具体类型的write方法,将Java对象转换后写入返回内容
+             */
+            @Override
+            protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+                if (object instanceof String){
+                    // 参考StringHttpMessageConverter
+                    // Charset charset = this.getContentTypeCharset(outputMessage.getHeaders().getContentType());
+                    StreamUtils.copy((String)object, Charset.defaultCharset(), outputMessage.getBody());
+                }else{
+                    super.writeInternal(object, type, outputMessage);
+                }
             }
-        }
+            /*private Charset getContentTypeCharset(MediaType contentType) {
+                return contentType != null && contentType.getCharset() != null?contentType.getCharset():this.getDefaultCharset();
+            }*/
+        });
     }
 
     @Bean

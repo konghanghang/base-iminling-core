@@ -5,12 +5,13 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.iminling.common.json.model.Group;
 import com.iminling.common.json.model.Student;
 import com.iminling.common.json.model.Teacher;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 class JsonUtilTest {
 
@@ -55,5 +56,15 @@ class JsonUtilTest {
         xml = "<HashMap><HANG>hhhh222</HANG><KONG>hh<![CDATA[>]]>hh</KONG></HashMap>";
         Map newMap = xmlMapper.readValue(xml, Map.class);
         System.out.println("==========");
+    }
+
+    @Test
+    void testString() {
+        String wo = JsonUtil.obj2Str("wo");
+        System.out.println(wo);
+        Map<String, Object> map = new HashMap<>();
+        map.put("KONG", "hh<hh");
+        map.put("HANG", "hhhh222");
+        System.out.println(JsonUtil.obj2Str(map));
     }
 }
