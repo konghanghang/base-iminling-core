@@ -13,5 +13,6 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.11.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.3")
     api("com.github.ben-manes.caffeine:caffeine:2.8.8")
+    api("com.squareup.okhttp3:okhttp:4.9.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.3")
 }
