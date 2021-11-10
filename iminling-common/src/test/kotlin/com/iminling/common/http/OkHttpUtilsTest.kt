@@ -6,6 +6,7 @@ import okhttp3.Response
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
 
 /**
  * @author yslao@outlook.com
@@ -37,6 +38,13 @@ internal class OkHttpUtilsTest {
         var res = httpClient.newCall(build).execute()
         var resStr = res.body?.string()
         println(resStr)
+    }
+
+    @Test
+    fun testSsl() {
+        var inputStream = File("d:\\apiclient_cert.p12").inputStream()
+        var client = OkHttpUtils.okHttpSSLClientBuilder(inputStream, "10024826p", "PKCS12")
+        client.build()
     }
 
 }

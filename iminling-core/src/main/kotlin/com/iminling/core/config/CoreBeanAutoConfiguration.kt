@@ -1,6 +1,7 @@
 package com.iminling.core.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.iminling.common.http.OkHttpUtils
 import com.iminling.common.json.JsonUtil
 import com.iminling.core.ApplicationConstant
 import com.iminling.core.config.argument.DefaultRequestDataReader
@@ -9,6 +10,9 @@ import com.iminling.core.config.argument.GlobalArgumentResolverConfig
 import com.iminling.core.config.exception.GlobalExceptionHandler
 import com.iminling.core.config.jpa.CustomizeJpaConfiguration
 import com.iminling.core.config.mybatis.CustomizeMybatisConfig
+import com.iminling.core.config.rest.EnhanceRestTemplate
+import com.iminling.core.config.rest.RestTemplateErrorHandler
+import com.iminling.core.config.rest.RestTemplateLoggingInterceptor
 import com.iminling.core.config.value.GlobalReturnValueHandler
 import com.iminling.core.filter.AuthFilter
 import com.iminling.core.filter.CustomizeGlobalFilter
@@ -21,6 +25,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.core.env.ConfigurableEnvironment
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory
+import org.springframework.web.client.RestTemplate
 import springfox.documentation.builders.ApiInfoBuilder
 import springfox.documentation.builders.PathSelectors
 import springfox.documentation.builders.RequestHandlerSelectors
@@ -117,9 +123,9 @@ class CoreBeanAutoConfiguration {
 
     /**
      * knife4j配置
-     * todo apiInfo配置
      */
     @Bean(value = ["defaultApi2"])
+    @ConditionalOnMissingBean(Docket::class)
     fun defaultApi2(knife4jApiInfoProperties: Knife4jApiInfoProperties): Docket {
         /*var selectors = mutableListOf<Predicate<RequestHandler>>()
         knife4jApiInfoProperties.packages.forEach { selectors.add(RequestHandlerSelectors.basePackage(it)) }*/
@@ -145,6 +151,22 @@ class CoreBeanAutoConfiguration {
             //.apis(Predicates.or(selectors))
             .paths(PathSelectors.any())
             .build()
+    }
+
+    /**
+     * 自定义restTemplate客户端
+     */
+    @Bean
+    @ConditionalOnMissingBean(RestTemplate::class)
+    fun restTemplate(environment: ConfigurableEnvironment): RestTemplate {
+        val okHttp3ClientHttpRequestFactory = OkHttp3ClientHttpRequestFactory(OkHttpUtils.okHttpClientBuilder().build())
+        var enable = environment.getProperty(ApplicationConstant.KEY_REST_TIMEOUT, "false")
+        var restTemplate = EnhanceRestTemplate(enable.toBoolean())
+        restTemplate.requestFactory = okHttp3ClientHttpRequestFactory
+        val interceptors = restTemplate.interceptors
+        interceptors.add(RestTemplateLoggingInterceptor())
+        restTemplate.errorHandler = RestTemplateErrorHandler()
+        return restTemplate
     }
 
 }
