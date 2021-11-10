@@ -1,5 +1,6 @@
 package com.iminling.core.config;
 
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iminling.common.json.JsonUtil;
 import com.iminling.core.ApplicationConstant;
@@ -17,21 +18,6 @@ import com.iminling.core.util.ThreadContext;
 import com.iminling.model.core.ClientInfo;
 import com.iminling.model.core.LogRecord;
 import com.iminling.model.exception.AuthorizeException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.lang.Nullable;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.ContentCachingResponseWrapper;
-import org.springframework.web.util.WebUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -41,6 +27,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.lang.Nullable;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
+import org.springframework.web.util.WebUtils;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -124,7 +123,8 @@ public class GlobalInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
                                 @Nullable Exception ex) throws Exception {
-        if (!handler.getClass().isAssignableFrom(HandlerMethod.class) || LogUtils.Companion.canLog(request.getRequestURI())) {
+        if (!handler.getClass().isAssignableFrom(HandlerMethod.class)
+            || !LogUtils.Companion.canLog(request.getRequestURI())) {
             return;
         }
         boolean enableArgumentLog = environment.getProperty(ApplicationConstant.KEY_LOGGER_ARGUMENTS, Boolean.class, false);
@@ -169,6 +169,9 @@ public class GlobalInterceptor implements HandlerInterceptor {
      * @throws UnsupportedEncodingException
      */
     private void handlerArgument(HttpServletRequest request) throws UnsupportedEncodingException {
+        if (Objects.isNull(ThreadContext.getLogRecord())) {
+            return;
+        }
         ContentCachingRequestWrapper requestWrapper = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
         if (Objects.nonNull(requestWrapper)) {
             requestWrapper.setCharacterEncoding(StandardCharsets.UTF_8.name());
@@ -213,7 +216,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
      */
     private String getPath(HttpServletRequest request) {
         String path = request.getHeader("path");
-        if (StringUtils.isNotEmpty(path)) {
+        if (StrUtil.isNotEmpty(path)) {
             try {
                 path = URLDecoder.decode(path, "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -227,7 +230,7 @@ public class GlobalInterceptor implements HandlerInterceptor {
      */
     private void writeLog() {
         LogRecord logRecord = ThreadContext.getLogRecord();
-        if (StringUtils.isNotEmpty(logRecord.getDescription())) {
+        if (StrUtil.isNotEmpty(logRecord.getDescription())) {
             logServices.stream().forEach(log -> {
                 executorService.execute(() -> {
                     log.saveLog(logRecord);

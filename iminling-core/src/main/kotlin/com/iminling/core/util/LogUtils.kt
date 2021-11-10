@@ -33,7 +33,7 @@ class LogUtils {
         private val urlResponseMatcher: PathMatcher = PathMatcher(IGNORE_URL_SET)
 
         fun canLog(url: String): Boolean {
-            return urlMatcher.ignore(url)
+            return !urlMatcher.ignore(url)
         }
 
         fun containsMethod(method: String): Boolean {

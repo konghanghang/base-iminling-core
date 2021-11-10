@@ -38,8 +38,8 @@ public class CustomizeGlobalFilter extends OncePerRequestFilter implements Order
             return;
         }
         boolean flag = false;
-        if (!LogUtils.Companion.containsMethod(request.getMethod())
-                || LogUtils.Companion.canLog(request.getRequestURI())) {
+        if (LogUtils.Companion.containsMethod(request.getMethod())
+                || !LogUtils.Companion.canLog(request.getRequestURI())) {
             flag = true;
             initLogRecord(request);
             if (isFirstRequest && !(request instanceof ContentCachingRequestWrapper)) {
