@@ -1,5 +1,6 @@
 package com.iminling.model.page
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.swagger.annotations.ApiModelProperty
 
 /**
@@ -37,8 +38,9 @@ class PageModel {
      * 获取offset, limit offset,pageSize
      * @return offset
      */
-    fun getOffset(): Long {
-        return (pageNum - 1) * pageSize
-    }
+    @ApiModelProperty(hidden = true)
+    @JsonIgnore
+    var offset: Long = 0
+        get() = (pageNum - 1) * pageSize
 
 }

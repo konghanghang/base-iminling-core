@@ -1,5 +1,6 @@
 package com.iminling.core.config;
 
+import com.iminling.common.json.JsonUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -63,7 +64,7 @@ public class CustomMvcAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(0, new MappingJackson2HttpMessageConverter() {
+        converters.add(0, new MappingJackson2HttpMessageConverter(JsonUtil.getInstant()) {
             /**
              * 重写Jackson消息转换器的writeInternal方法
              * SpringMVC选定了具体的消息转换类型后,会调用具体类型的write方法,将Java对象转换后写入返回内容

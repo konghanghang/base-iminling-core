@@ -18,10 +18,8 @@ class PathMatcher constructor(antUrl: MutableSet<String>) {
         this.suffixUrl = suffixUrl
     }
 
-    private val antPathMatcher = AntPathMatcher()
-
-    init {
-        antPathMatcher.setCaseSensitive(false)
+    private val antPathMatcher = AntPathMatcher().apply {
+        setCaseSensitive(false)
     }
 
     fun ignore(url: String): Boolean {
