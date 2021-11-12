@@ -11,8 +11,8 @@ import kotlin.math.ceil
 class JPageBuilder {
 
     companion object {
-        fun <T> build(fetchResults: QueryResults<T>, pageModel: PageModel): Pagination<T> {
-            var page = Pagination<T>(pageModel)
+        fun <T> build(fetchResults: QueryResults<T>, pageModel: PageModel): PageResp<T> {
+            var page = PageResp<T>(pageModel)
             pageModel.total = fetchResults.total
             pageModel.pages = ceil(pageModel.total.toDouble()/pageModel.pageSize).toLong()
             page.list = fetchResults.results

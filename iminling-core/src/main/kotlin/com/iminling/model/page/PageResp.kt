@@ -5,7 +5,7 @@ package com.iminling.model.page
  * @author yslao@outlook.com
  * @since 2021/9/25
  */
-class Pagination<T> constructor() {
+class PageResp<T> constructor() {
 
     constructor(pageModel: PageModel) : this() {
         this.pageModel = pageModel

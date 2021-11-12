@@ -10,14 +10,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage
 class MPageBuilder {
 
     companion object {
-        fun <T> builder(page: IPage<T>): Pagination<T> {
-            var pagination = Pagination<T>()
-            pagination.pageModel.pageNum = page.current
-            pagination.pageModel.pages = page.pages
-            pagination.pageModel.pageSize = page.size
-            pagination.pageModel.total = page.total
-            pagination.list = page.records
-            return pagination
+        fun <T> builder(page: IPage<T>): PageResp<T> {
+            var pageResp = PageResp<T>()
+            pageResp.pageModel.pageNum = page.current
+            pageResp.pageModel.pages = page.pages
+            pageResp.pageModel.pageSize = page.size
+            pageResp.pageModel.total = page.total
+            pageResp.list = page.records
+            return pageResp
         }
     }
 
