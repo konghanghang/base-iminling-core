@@ -10,7 +10,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-aop")
     api("org.hibernate.validator:hibernate-validator:6.1.6.Final")
-    api("com.auth0:java-jwt:3.3.0")
     api("com.github.xiaoymin:knife4j-spring-boot-starter:2.0.7")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.3")
 }

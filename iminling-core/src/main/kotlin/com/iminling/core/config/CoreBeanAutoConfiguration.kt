@@ -155,6 +155,7 @@ class CoreBeanAutoConfiguration {
 
     /**
      * 自定义restTemplate客户端
+     * 配置https https://blog.csdn.net/zhousheng193/article/details/84830164
      */
     @Bean
     @ConditionalOnMissingBean(RestTemplate::class)

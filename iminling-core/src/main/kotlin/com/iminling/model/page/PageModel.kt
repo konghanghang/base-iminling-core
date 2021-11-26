@@ -19,13 +19,13 @@ class PageModel {
     /**
      * 总记录数
      */
-    @ApiModelProperty(value = "总记录数,多余参数不用传")
+    @ApiModelProperty(value = "总记录数")
     var total: Long = 0
 
     /**
      * 总页数
      */
-    @ApiModelProperty(value = "总页数,多余参数不用传")
+    @ApiModelProperty(value = "总页数")
     var pages: Long = 0
 
     /**

@@ -1,8 +1,7 @@
 package com.iminling.common.crypto;
 
-import org.junit.jupiter.api.Test;
-
 import java.util.Base64;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author yslao@outlook.com
@@ -12,9 +11,9 @@ public class AESUtilsTest {
 
     @Test
     void encryptECB() {
-        String en = AESUtils.encryptECB("我是aaa");
+        String en = AESUtils.Companion.encryptECB("我是aaa");
         System.out.println(en);
-        String s = AESUtils.decryptECB(en);
+        String s = AESUtils.Companion.decryptECB(en);
         System.out.println(s);
     }
 
@@ -34,9 +33,9 @@ public class AESUtilsTest {
         String baseIv = encoder.encodeToString(iv.getBytes());
 
         //获取加密数据
-        String encryptedData = AESUtils.encryptCBC(baseData,baseSessionKey,baseIv);
+        String encryptedData = AESUtils.Companion.encryptCBC(baseData,baseSessionKey,baseIv);
         //通过加密数据获得原始数据
-        String dataReborn = AESUtils.decryptCBC(encryptedData,baseSessionKey,baseIv);
+        String dataReborn = AESUtils.Companion.decryptCBC(encryptedData,baseSessionKey,baseIv);
 
         //打印解密出来的原始数据
         System.out.println(dataReborn);
