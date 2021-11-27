@@ -1,7 +1,7 @@
 package com.iminling.core.config.rest
 
 import com.iminling.common.json.JsonUtil
-import com.iminling.model.common.ResultModel
+import com.iminling.core.config.value.ResultModel
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.AbstractClientHttpResponse
 import org.springframework.http.client.ClientHttpResponse

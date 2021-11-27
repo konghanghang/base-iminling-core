@@ -2,9 +2,6 @@ package com.iminling.core;
 
 public class ApplicationConstant {
 
-    public static final String KEY_LOGGER_ARGUMENTS = "application.log.argument";
-    public static final String KEY_LOGGER_RESULT = "application.log.result";
-
     public static final String KEY_REST_TIMEOUT = "application.rest.timeout.enable";
 
 

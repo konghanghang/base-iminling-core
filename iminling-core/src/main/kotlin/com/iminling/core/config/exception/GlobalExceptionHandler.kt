@@ -2,10 +2,10 @@ package com.iminling.core.config.exception
 
 import com.google.common.base.Joiner
 import com.iminling.common.json.JsonUtil
-import com.iminling.model.common.MessageCode
-import com.iminling.model.common.ResultModel
-import com.iminling.model.exception.AuthorizeException
-import com.iminling.model.exception.BizException
+import com.iminling.core.config.value.ResultModel
+import com.iminling.core.constant.MessageCode
+import com.iminling.core.exception.AuthorizeException
+import com.iminling.core.exception.BizException
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.validation.BindException
@@ -28,26 +28,26 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
-    fun validExceptionHandler(exception: BindException) :ResultModel<*> {
+    fun validExceptionHandler(exception: BindException) : ResultModel<*> {
         val fieldErrors: List<FieldError> = exception.bindingResult.fieldErrors
         val map: MutableMap<String, String?> = HashMap()
         for (error in fieldErrors) {
             map[error.field] = error.defaultMessage
         }
-        return ResultModel.isFail(JsonUtil.obj2Str(map))
+        return ResultModel.fail(JsonUtil.obj2Str(map))
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun methodArgumentNotValidExceptionHandler(e: MethodArgumentNotValidException): ResultModel<*> {
         val fieldErrors = e.bindingResult.fieldErrors.map { it.defaultMessage }
-        return ResultModel.isFail(Joiner.on("、").join(fieldErrors))
+        return ResultModel.fail(Joiner.on("、").join(fieldErrors))
     }
 
     @ExceptionHandler(NoHandlerFoundException::class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     fun noHandlerFoundExceptionHandler(e: NoHandlerFoundException?, request: HttpServletRequest): ResultModel<*> {
-        return ResultModel.isFail(String.format("url:%s not found", request.servletPath), HttpStatus.NOT_FOUND.value())
+        return ResultModel.fail(String.format("url:%s not found", request.servletPath), HttpStatus.NOT_FOUND.value())
     }
 
     @ExceptionHandler(AuthorizeException::class)
@@ -62,7 +62,7 @@ class GlobalExceptionHandler {
             e.messageCode.code, e.messageCode.message
         )
         response.status = e.messageCode.code
-        return ResultModel.isFail(e.messageCode)
+        return ResultModel.fail(e.messageCode)
     }
 
     @ExceptionHandler(MissingServletRequestParameterException::class)
@@ -70,7 +70,7 @@ class GlobalExceptionHandler {
     fun missingServletRequestParameterExceptionHandler(
         e: MissingServletRequestParameterException
     ): ResultModel<*> {
-        return ResultModel.isFail(e.parameterName + "不能为空")
+        return ResultModel.fail(e.parameterName + "不能为空")
     }
 
     @ExceptionHandler(ValidationException::class)
@@ -82,16 +82,16 @@ class GlobalExceptionHandler {
             request.method,
             e.message
         )
-        return ResultModel.isFail(e.message)
+        return ResultModel.fail(e.message ?: "")
     }
 
     @ExceptionHandler(BizException::class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun baseExceptionHandler(e: BizException): ResultModel<*> {
         return if (Objects.nonNull(e.messageCode)) {
-            ResultModel.isFail(e.messageCode)
+            ResultModel.fail(e.messageCode ?: MessageCode.RESULT_FAIL)
         } else {
-            ResultModel.isFail(e.message)
+            ResultModel.fail(e.message ?: "")
         }
     }
 
@@ -99,7 +99,7 @@ class GlobalExceptionHandler {
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     fun exceptionHandler(e: Exception, request: HttpServletRequest): ResultModel<*> {
         logger.error("Exception, url:{}, message:{}", request.requestURI, e.message, e)
-        return ResultModel.isFail(MessageCode.RESULT_FAIL)
+        return ResultModel.fail(MessageCode.RESULT_FAIL)
     }
 
 }

@@ -1,6 +1,6 @@
 package com.iminling.core.filter;
 
-import com.iminling.model.exception.BizException;
+import com.iminling.core.exception.BizException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.method.HandlerMethod;

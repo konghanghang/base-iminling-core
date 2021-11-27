@@ -15,11 +15,9 @@ import com.iminling.core.config.rest.RestTemplateErrorHandler
 import com.iminling.core.config.rest.RestTemplateLoggingInterceptor
 import com.iminling.core.config.value.GlobalReturnValueHandler
 import com.iminling.core.filter.AuthFilter
-import com.iminling.core.filter.CustomizeGlobalFilter
 import com.iminling.core.filter.Filter
 import com.iminling.core.filter.LoginFilter
-import com.iminling.core.service.ILogService
-import com.iminling.properties.Knife4jApiInfoProperties
+import com.iminling.core.properties.Knife4jApiInfoProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -97,7 +95,6 @@ class CoreBeanAutoConfiguration {
      * @param defaultRequestDataReader 请求数据读取
      * @param loginFilter 登录验证过滤器，有对应bean则size = 0，不会是null
      * @param authFilter 授权验证过滤器，有对应bean则size = 0，不会是null
-     * @param logServices 日志记录服务，有对应bean则size = 0，不会是null
      * @return [GlobalInterceptor]
      */
     @Bean
@@ -105,7 +102,7 @@ class CoreBeanAutoConfiguration {
     fun globalInterceptor(
         environment: ConfigurableEnvironment,
         defaultRequestDataReader: DefaultRequestDataReader,
-        loginFilter: List<LoginFilter>, authFilter: List<AuthFilter>, logServices: MutableList<ILogService>
+        loginFilter: List<LoginFilter>, authFilter: List<AuthFilter>
     ): GlobalInterceptor {
         val filters: MutableList<Filter> = ArrayList(4)
         val enable = "enable"
@@ -115,10 +112,7 @@ class CoreBeanAutoConfiguration {
         if (environment.getProperty(ApplicationConstant.KEY_FILTER_AUTH, enable) == enable) {
             filters.addAll(authFilter)
         }
-        if (environment.getProperty(ApplicationConstant.KEY_FILTER_LOG, enable) != enable) {
-            logServices.clear()
-        }
-        return GlobalInterceptor(defaultRequestDataReader, filters, logServices, environment)
+        return GlobalInterceptor(defaultRequestDataReader, filters, environment)
     }
 
     /**

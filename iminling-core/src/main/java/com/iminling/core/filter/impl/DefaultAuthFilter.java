@@ -1,7 +1,7 @@
 package com.iminling.core.filter.impl;
 
+import com.iminling.core.exception.BizException;
 import com.iminling.core.filter.AuthFilter;
-import com.iminling.model.exception.BizException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.method.HandlerMethod;
