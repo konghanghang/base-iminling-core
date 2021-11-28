@@ -2,8 +2,8 @@ package com.iminling.core.config.value
 
 import com.iminling.common.json.JsonUtil
 import com.iminling.core.annotation.EnableResolve
-import com.iminling.core.annotation.EnableResolve.ResolveStrategy
 import com.iminling.core.constant.MessageCode
+import com.iminling.core.constant.ResolveStrategy
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

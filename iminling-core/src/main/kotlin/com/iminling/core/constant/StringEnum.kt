@@ -20,5 +20,6 @@ enum class StringEnum(open val desc: String) {
     EXPIRES_IN("expires_in"),
     TICKET("ticket"),
     AUTHORIZATION("Authorization"),
+    REQUEST_DATA_KEY("global.requestData"),
 
 }

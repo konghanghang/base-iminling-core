@@ -1,15 +1,12 @@
 package com.iminling.core.config
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.iminling.common.json.JsonUtil
 import com.iminling.core.annotation.EnableResolve
-import com.iminling.core.annotation.EnableResolve.ResolveStrategy
 import com.iminling.core.config.argument.DefaultRequestDataReader
-import com.iminling.core.config.argument.GlobalArgumentResolver
 import com.iminling.core.config.argument.RequestDataWrapper
+import com.iminling.core.config.filter.Filter
+import com.iminling.core.constant.ResolveStrategy
 import com.iminling.core.constant.StringEnum
-import com.iminling.core.filter.Filter
-import com.iminling.core.log.ClientInfo
 import com.iminling.core.util.LogUtils
 import com.iminling.core.util.ThreadContext
 import org.slf4j.LoggerFactory
@@ -18,7 +15,6 @@ import org.springframework.http.server.ServletServerHttpRequest
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.ModelAndView
-import org.springframework.web.util.ContentCachingRequestWrapper
 import org.springframework.web.util.ContentCachingResponseWrapper
 import org.springframework.web.util.WebUtils
 import java.io.IOException
@@ -102,10 +98,10 @@ class GlobalInterceptor(
     private fun handlerCustomizeArgument(request: HttpServletRequest, handlerMethod: HandlerMethod) {
         val inputMessage = ServletServerHttpRequest(request)
         val requestDataWrapper = RequestDataWrapper(false)
-        request.setAttribute(GlobalArgumentResolver.REQUEST_DATA_KEY, requestDataWrapper)
+        request.setAttribute(StringEnum.REQUEST_DATA_KEY.desc, requestDataWrapper)
         if (defaultRequestDataReader.canRead(inputMessage)) {
-            requestDataWrapper.isCanRead = true
-            val read: JsonNode = defaultRequestDataReader.read(inputMessage, handlerMethod)
+            requestDataWrapper.canRead = true
+            val read = defaultRequestDataReader.read(inputMessage, handlerMethod)
             requestDataWrapper.parseJsonNode(read)
             var body = read.toString()
         }
