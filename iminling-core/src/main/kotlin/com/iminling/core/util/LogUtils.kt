@@ -40,6 +40,10 @@ class LogUtils {
             return HTTP_METHOD.contains(method.uppercase())
         }
 
+        fun containsHeader(header: String): Boolean {
+            return IGNORE_HEADER.contains(header)
+        }
+
     }
 
 }

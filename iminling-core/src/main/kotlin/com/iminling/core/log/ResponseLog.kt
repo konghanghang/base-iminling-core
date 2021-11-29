@@ -1,10 +1,15 @@
 package com.iminling.core.log
 
+import com.iminling.common.json.JsonUtil
+import com.iminling.core.util.LogUtils
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+
 /**
  * @author  yslao@outlook.com
  * @since  2021/11/26
  */
-class ResponseLog {
+class ResponseLog(var type: String = "spring") {
 
     /**
      * 请求URI
@@ -46,5 +51,33 @@ class ResponseLog {
     var requestBody: String? = null
 
     var responseBody: String? = null
+
+    fun wrap(request: HttpServletRequest, response: HttpServletResponse, requestBody: String, responseBody: String, error: String?, time: Long) {
+        this.uri = request.requestURI
+        this.httpMethod = request.method
+        this.respStatus = response.status
+        this.status = response.status
+        this.time = time
+        this.message = ""
+        this.header = JsonUtil.obj2Str(extractHeaderToMap(response))
+        this.error = error
+        this.requestBody = if(requestBody.length >= 500) requestBody.substring(0, 500) else requestBody
+        this.responseBody = responseBody
+    }
+
+    private fun extractHeaderToMap(response: HttpServletResponse): Map<String, String> {
+        val headerNames = response.headerNames ?: return mutableMapOf()
+        val headerMap = mutableMapOf<String, String>()
+        for (header in headerNames) {
+            if (!LogUtils.containsHeader(header)) {
+                headerMap[header] = response.getHeader(header)
+            }
+        }
+        return headerMap
+    }
+
+    override fun toString(): String {
+        return "Log_1 ${JsonUtil.obj2Str(this)}"
+    }
 
 }

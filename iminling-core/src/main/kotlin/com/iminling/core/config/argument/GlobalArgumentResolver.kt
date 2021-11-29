@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse
  * @author  yslao@outlook.com
  * @since  2021/11/28
  */
-class GlobalArgumentResolver(val objectMapper: ObjectMapper) : HandlerMethodArgumentResolver {
+class GlobalArgumentResolver(private val objectMapper: ObjectMapper) : HandlerMethodArgumentResolver {
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         val request = (RequestContextHolder.getRequestAttributes() as ServletRequestAttributes?)!!.request
@@ -85,8 +85,8 @@ class GlobalArgumentResolver(val objectMapper: ObjectMapper) : HandlerMethodArgu
         if (Objects.nonNull(requestHeader)) {
             return false
         }
-        val requestDataWrapper = request.getAttribute(StringEnum.REQUEST_DATA_KEY.desc) as RequestDataWrapper
-        return Objects.nonNull(requestDataWrapper) && requestDataWrapper.canRead
+        val requestDataWrapper = request.getAttribute(StringEnum.REQUEST_DATA_KEY.desc) as RequestDataWrapper?
+        return Objects.nonNull(requestDataWrapper) && requestDataWrapper!!.canRead
     }
 
     private fun getRequestData(webRequest: NativeWebRequest?): RequestDataWrapper? {

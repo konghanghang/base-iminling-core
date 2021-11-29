@@ -21,5 +21,6 @@ enum class StringEnum(open val desc: String) {
     TICKET("ticket"),
     AUTHORIZATION("Authorization"),
     REQUEST_DATA_KEY("global.requestData"),
+    SPRING("spring"),
 
 }

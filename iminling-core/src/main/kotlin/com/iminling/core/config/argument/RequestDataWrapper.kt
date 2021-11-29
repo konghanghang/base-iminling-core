@@ -1,6 +1,7 @@
 package com.iminling.core.config.argument
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.iminling.common.json.JsonUtil
 
 /**
  * @author  yslao@outlook.com
@@ -21,6 +22,10 @@ class RequestDataWrapper {
             this.params = params
             hasParams = !params.isNull && !params.isMissingNode
         }
+    }
+
+    override fun toString(): String {
+        return "${JsonUtil.obj2Str(params)}"
     }
 
 }
