@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest
  * @author  yslao@outlook.com
  * @since  2021/11/28
  */
+// @JvmDefaultWithoutCompatibility
 interface Filter: Ordered {
 
     @Throws(BizException::class)
