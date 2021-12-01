@@ -23,7 +23,9 @@ enum class MessageCode(open val code: Int, open val message: String) {
     PERMISSION_DENY(403, "无权操作"),
 
     /*参数*/
-    PARAM_IS_NULL(800, "参数为空"),
+    PARAM_ERROR(800, "参数异常"),
+    PARAM_CODE_ERROR(801, "验证码错误"),
+    PARAM_IS_NULL(899, "参数为空"),
 
     /*图片*/
     IMAGE_FORMAT_ERROR(900, "图片格式不正确"),

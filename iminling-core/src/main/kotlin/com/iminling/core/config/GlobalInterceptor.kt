@@ -48,7 +48,7 @@ class GlobalInterceptor(
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         // 过滤非controller的请求
         if (!handler.javaClass.isAssignableFrom(HandlerMethod::class.java)
-            || LogUtils.canLog(request.requestURI)
+            || !LogUtils.canLog(request.requestURI)
         ) {
              return true
         }

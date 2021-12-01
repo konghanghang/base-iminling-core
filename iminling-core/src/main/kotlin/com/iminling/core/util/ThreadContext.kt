@@ -3,6 +3,7 @@ package com.iminling.core.util
 import com.iminling.core.log.ClientInfo
 import java.util.*
 
+
 /**
  * @author  yslao@outlook.com
  * @since  2021/11/26
@@ -32,6 +33,14 @@ class ThreadContext {
                 map = mutableMapOf()
             }
             map[key] = value
+        }
+
+        private const val userKey = "k0000-system-user-info"
+        fun <T> getAccount(clazz: Class<T>): T? {
+            return getAttribute(userKey) as T?
+        }
+        fun setAccount(obj: Any) {
+            setAttribute(userKey, obj)
         }
 
         fun clear() {

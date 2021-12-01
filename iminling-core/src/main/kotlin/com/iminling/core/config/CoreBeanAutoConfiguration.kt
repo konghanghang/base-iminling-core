@@ -15,7 +15,7 @@ import com.iminling.core.config.jpa.CustomizeJpaConfiguration
 import com.iminling.core.config.mybatis.CustomizeMybatisConfig
 import com.iminling.core.config.rest.EnhanceRestTemplate
 import com.iminling.core.config.rest.RestTemplateErrorHandler
-import com.iminling.core.config.rest.RestTemplateLoggingInterceptor
+import com.iminling.core.config.rest.TextPlainHttpMessageConverter
 import com.iminling.core.config.value.GlobalReturnValueHandler
 import com.iminling.core.properties.Knife4jApiInfoProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.http.client.OkHttp3ClientHttpRequestFactory
+import org.springframework.http.converter.HttpMessageConverter
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.client.RestTemplate
 import springfox.documentation.builders.ApiInfoBuilder
 import springfox.documentation.builders.PathSelectors
@@ -147,20 +149,31 @@ class CoreBeanAutoConfiguration {
             .build()
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    fun mappingJackson2HttpMessageConverter(): MappingJackson2HttpMessageConverter {
+        return MappingJackson2HttpMessageConverter(JsonUtil.getInstant())
+    }
+
     /**
      * 自定义restTemplate客户端
      * 配置https https://blog.csdn.net/zhousheng193/article/details/84830164
      */
     @Bean
     @ConditionalOnMissingBean(RestTemplate::class)
-    fun restTemplate(environment: ConfigurableEnvironment): RestTemplate {
+    fun restTemplate(environment: ConfigurableEnvironment,
+                     mappingJackson2HttpMessageConverter: MappingJackson2HttpMessageConverter): RestTemplate {
         val okHttp3ClientHttpRequestFactory = OkHttp3ClientHttpRequestFactory(OkHttpUtils.okHttpClientBuilder().build())
         var enable = environment.getProperty(ApplicationConstant.KEY_REST_TIMEOUT, "false")
         var restTemplate = EnhanceRestTemplate(enable.toBoolean())
         restTemplate.requestFactory = okHttp3ClientHttpRequestFactory
-        val interceptors = restTemplate.interceptors
-        interceptors.add(RestTemplateLoggingInterceptor())
+        //val interceptors = restTemplate.interceptors
+        //interceptors.add(RestTemplateLoggingInterceptor())
         restTemplate.errorHandler = RestTemplateErrorHandler()
+        val messageConverters = restTemplate.messageConverters
+        messageConverters.removeIf { converter: HttpMessageConverter<*>? -> converter is MappingJackson2HttpMessageConverter }
+        messageConverters.add(mappingJackson2HttpMessageConverter)
+        messageConverters.add(TextPlainHttpMessageConverter(JsonUtil.getInstant()))
         return restTemplate
     }
 

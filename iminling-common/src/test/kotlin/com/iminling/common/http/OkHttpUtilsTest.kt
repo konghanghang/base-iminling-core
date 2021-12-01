@@ -30,7 +30,7 @@ internal class OkHttpUtilsTest {
     @Test
     fun testHttp() {
         var build = Request.Builder()
-            .url("https://test.com/article/chosen")
+            .url("http://localhost:8080/role/list")
             .header("aaa", "aaa")
             .header("User-Agent", "okhttp")
             .get()

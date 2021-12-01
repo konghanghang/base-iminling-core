@@ -14,7 +14,7 @@ plugins {
     // java
     kotlin("jvm") version "1.5.30"
     kotlin("plugin.spring") version "1.5.30"
-    id("com.gorylenko.gradle-git-properties") version "2.3.1"
+    id("com.gorylenko.gradle-git-properties") version "2.2.2"
     // 解决kotlin无法识别java使用lombok的@getter等方法 https://kotlinlang.org/docs/lombok.html#gradle
     kotlin("plugin.lombok") version "1.5.30"
     `java-library`

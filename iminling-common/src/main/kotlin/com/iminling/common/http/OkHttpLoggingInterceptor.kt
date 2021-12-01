@@ -1,26 +1,32 @@
 package com.iminling.common.http
 
+import cn.hutool.core.util.StrUtil
 import okhttp3.Interceptor
+import okhttp3.Request
 import okhttp3.Response
 import okio.Buffer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.function.Predicate
 
 /**
  *
  * @author yslao@outlook.com
  * @since 2021/11/7
  */
-class OkHttpLoggingInterceptor: Interceptor {
+class OkHttpLoggingInterceptor : Interceptor {
 
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     // header全部转成小写进行比较
-    var ignoreHeaders = setOf("user-agent", "cookie", "accept", "sec-fetch-dest", "accept-language",
+    var ignoreHeaders = setOf(
+        "user-agent", "cookie", "accept", "sec-fetch-dest", "accept-language",
         "cache-control", "sec-fetch-mode", "connection", "accept-encoding", "upgrade-insecure-requests",
-        "sec-fetch-site", "sec-fetch-user")
+        "sec-fetch-site", "sec-fetch-user"
+    )
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        var start = System.currentTimeMillis()
         var request = chain.request()
         var url = request.url.toString()
         var method = request.method
@@ -32,7 +38,7 @@ class OkHttpLoggingInterceptor: Interceptor {
         }
         var headers = request.headers.toMultimap()
         headers = headers.filter { !ignoreHeaders.contains(it.key.lowercase()) }
-        log.info("url:{}, method:{}, body:{}, headers:{}", url, method, body, headers)
+        log.info("OKHTTP_0, url:{}, method:{}, body:{}, headers:{}", url, method, body?.replace("\n", ""), headers)
         var exception: Exception? = null
         var response: Response? = null
         try {
@@ -42,11 +48,22 @@ class OkHttpLoggingInterceptor: Interceptor {
             exception = e
             throw e
         } finally {
+            var end = System.currentTimeMillis()
             var source = response?.body?.source()
             source?.request(Long.MAX_VALUE)
             var buffer = source?.buffer
             var res = buffer?.clone()?.readUtf8()
-            log.info("response:{}", res)
+            var headers = response?.headers?.toMultimap()
+            headers = headers?.filter { !ignoreHeaders.contains(it.key.lowercase()) }
+            log.info(
+                "OKHTTP_0,  url:{}, method:{}, times:{}, response:{}, error:{}, headers:{}",
+                url,
+                method,
+                end - start,
+                res?.replace("\n", ""),
+                exception?.message,
+                headers
+            )
         }
     }
 }
