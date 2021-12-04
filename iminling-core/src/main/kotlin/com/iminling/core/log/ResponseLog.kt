@@ -62,7 +62,7 @@ class ResponseLog(var type: String = "spring") {
         this.header = JsonUtil.obj2Str(extractHeaderToMap(response))
         this.error = error
         this.requestBody = if(requestBody.length >= 500) requestBody.substring(0, 500) else requestBody
-        this.responseBody = responseBody
+        this.responseBody = if(responseBody.length >= 500) responseBody.substring(0, 500) else responseBody
     }
 
     private fun extractHeaderToMap(response: HttpServletResponse): Map<String, String> {

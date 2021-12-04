@@ -1,12 +1,11 @@
 package com.iminling.core.config
 
 import cn.hutool.core.util.StrUtil
-import com.iminling.common.json.JsonUtil
 import com.iminling.core.constant.StringEnum
 import com.iminling.core.log.ClientInfo
-import com.iminling.core.util.LogUtils
 import com.iminling.core.log.RequestLog
 import com.iminling.core.log.ResponseLog
+import com.iminling.core.util.LogUtils
 import com.iminling.core.util.ThreadContext
 import org.slf4j.LoggerFactory
 import org.springframework.core.Ordered
@@ -58,7 +57,7 @@ class CustomizeGlobalFilter: OncePerRequestFilter(), Ordered {
         }
         var startTime = System.currentTimeMillis()
         var requestLog = RequestLog(StringEnum.SPRING.desc)
-        requestLog.wrap(request, JsonUtil.obj2Str(request.getAttribute(StringEnum.REQUEST_DATA_KEY.desc)))
+        requestLog.wrap(requestToUse, null)
         logger.info("$requestLog")
         var error: Exception? = null
         try {
@@ -94,7 +93,7 @@ class CustomizeGlobalFilter: OncePerRequestFilter(), Ordered {
                     }
                     val endTime = System.currentTimeMillis()
                     var responseLog = ResponseLog(StringEnum.SPRING.desc)
-                    responseLog.wrap(request, response, requestBody, responseBody, error?.message, endTime - startTime)
+                    responseLog.wrap(requestToUse, responseToUse, requestBody, responseBody, error?.message, endTime - startTime)
                     logger.info("$responseLog")
                 } catch (e: Exception) {
                     logger.error(e.message, e)

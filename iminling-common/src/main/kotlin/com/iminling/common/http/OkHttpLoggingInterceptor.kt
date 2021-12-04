@@ -1,13 +1,10 @@
 package com.iminling.common.http
 
-import cn.hutool.core.util.StrUtil
 import okhttp3.Interceptor
-import okhttp3.Request
 import okhttp3.Response
 import okio.Buffer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.function.Predicate
 
 /**
  *
@@ -56,9 +53,10 @@ class OkHttpLoggingInterceptor : Interceptor {
             var headers = response?.headers?.toMultimap()
             headers = headers?.filter { !ignoreHeaders.contains(it.key.lowercase()) }
             log.info(
-                "OKHTTP_0,  url:{}, method:{}, times:{}, response:{}, error:{}, headers:{}",
+                "OKHTTP_1,  url:{}, method:{}, status:{}, times:{}, response:{}, error:{}, headers:{}",
                 url,
                 method,
+                response?.code,
                 end - start,
                 res?.replace("\n", ""),
                 exception?.message,

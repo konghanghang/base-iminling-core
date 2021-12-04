@@ -3,9 +3,7 @@ package com.iminling.core.log
 import com.iminling.common.json.JsonUtil
 import com.iminling.core.util.LogUtils
 import com.iminling.core.util.ThreadContext
-import sun.plugin2.util.PojoUtil.toJson
 import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 /**
  * @author  yslao@outlook.com
