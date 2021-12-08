@@ -16,6 +16,7 @@ import com.iminling.core.config.mybatis.CustomizeMybatisConfig
 import com.iminling.core.config.rest.EnhanceRestTemplate
 import com.iminling.core.config.rest.RestTemplateErrorHandler
 import com.iminling.core.config.rest.TextPlainHttpMessageConverter
+import com.iminling.core.config.swagger.SwaggerAutoConfiguration
 import com.iminling.core.config.value.GlobalReturnValueHandler
 import com.iminling.core.properties.Knife4jApiInfoProperties
 import io.swagger.annotations.ApiOperation
@@ -42,8 +43,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc
  * @since 2021/2/19
  */
 @EnableSwagger2WebMvc
-@EnableConfigurationProperties(Knife4jApiInfoProperties::class)
-@Import(CustomizeMybatisConfig::class, CustomizeJpaConfiguration::class)
+@Import(CustomizeMybatisConfig::class, CustomizeJpaConfiguration::class, SwaggerAutoConfiguration::class)
 class CoreBeanAutoConfiguration {
 
     /*@Bean
@@ -116,31 +116,6 @@ class CoreBeanAutoConfiguration {
             filters.addAll(authFilter)
         }
         return GlobalInterceptor(defaultRequestDataReader, filters, environment)
-    }
-
-    /**
-     * knife4j配置
-     */
-    @Bean(value = ["defaultApi2"])
-    @ConditionalOnMissingBean(Docket::class)
-    fun defaultApi2(knife4jApiInfoProperties: Knife4jApiInfoProperties): Docket {
-        /*var selectors = mutableListOf<Predicate<RequestHandler>>()
-        knife4jApiInfoProperties.packages.forEach { selectors.add(RequestHandlerSelectors.basePackage(it)) }*/
-        return Docket(DocumentationType.SWAGGER_2)
-            .apiInfo(
-                ApiInfoBuilder() //.title("swagger-bootstrap-ui-demo RESTful APIs")
-                    .description(knife4jApiInfoProperties.description)
-                    .termsOfServiceUrl(knife4jApiInfoProperties.serviceUrl)
-                    .contact(Contact(knife4jApiInfoProperties.contactName, knife4jApiInfoProperties.contactUrl, knife4jApiInfoProperties.contactEmail))
-                    .version(knife4jApiInfoProperties.version)
-                    .build()
-            ) //分组名称
-            .groupName(knife4jApiInfoProperties.groupName)
-            .enable(knife4jApiInfoProperties.enable)
-            .select() //这里指定Controller扫描包路径
-            .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation::class.java))
-            .paths(PathSelectors.any())
-            .build()
     }
 
     @Bean
