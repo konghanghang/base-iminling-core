@@ -22,7 +22,7 @@ class PathMatcher constructor(antUrl: MutableSet<String>) {
         setCaseSensitive(false)
     }
 
-    fun ignore(url: String): Boolean {
+    fun match(url: String): Boolean {
         return suffixUrl.any { url.endsWith(it) } || antUrl.any { antPathMatcher.match(it, url) }
     }
 

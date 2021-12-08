@@ -25,10 +25,4 @@ class Knife4jApiInfoProperties {
 
     var enable:Boolean = true
 
-    var basePackage:String = ""
-
-    var packages:MutableList<String> = mutableListOf()
-
-    var excludePackages:MutableList<String> = mutableListOf()
-
 }

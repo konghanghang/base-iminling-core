@@ -18,6 +18,7 @@ import com.iminling.core.config.rest.RestTemplateErrorHandler
 import com.iminling.core.config.rest.TextPlainHttpMessageConverter
 import com.iminling.core.config.value.GlobalReturnValueHandler
 import com.iminling.core.properties.Knife4jApiInfoProperties
+import io.swagger.annotations.ApiOperation
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -137,14 +138,7 @@ class CoreBeanAutoConfiguration {
             .groupName(knife4jApiInfoProperties.groupName)
             .enable(knife4jApiInfoProperties.enable)
             .select() //这里指定Controller扫描包路径
-            .apis(RequestHandlerSelectors.basePackage(knife4jApiInfoProperties.basePackage))
-            /*.apis {
-                var clazz = it.declaringClass()
-                if (clazz == null) false else {
-                    ClassUtils.getPackageName(clazz).startsWith("")
-                }
-            }*/
-            //.apis(Predicates.or(selectors))
+            .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation::class.java))
             .paths(PathSelectors.any())
             .build()
     }

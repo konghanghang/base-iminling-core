@@ -43,9 +43,9 @@ class CustomizeGlobalFilter: OncePerRequestFilter(), Ordered {
             return
         }
         var flag = false
-        if (LogUtils.containsMethod(request.method) || !LogUtils.canLog(request.requestURI)) {
+        if (LogUtils.containsMethod(request.method) && LogUtils.canLog(request.requestURI)) {
             flag = true
-            if (isFirstRequest && request !is ContentCachingRequestWrapper) {
+            if (request !is ContentCachingRequestWrapper) {
                 requestToUse = ContentCachingRequestWrapper(
                     request,
                     if (request.contentLength >= 0) request.contentLength else 1024
@@ -56,9 +56,11 @@ class CustomizeGlobalFilter: OncePerRequestFilter(), Ordered {
             }
         }
         var startTime = System.currentTimeMillis()
-        var requestLog = RequestLog(StringEnum.SPRING.desc)
-        requestLog.wrap(requestToUse, null)
-        logger.info("$requestLog")
+        if (flag) {
+            var requestLog = RequestLog(StringEnum.SPRING.desc)
+            requestLog.wrap(requestToUse, null)
+            logger.info("$requestLog")
+        }
         var error: Exception? = null
         try {
             filterChain.doFilter(requestToUse, responseToUse)

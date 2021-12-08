@@ -13,7 +13,7 @@ class LogUtils {
         private val IGNORE_URL_SET = mutableSetOf(
             "/error",
             "/do_not_delete/*", "/fonts/**", "/css/**", "/actuator/**", "/swagger/**", "/swagger-ui.html",
-            "/swagger-resources/**",
+            "/swagger-resources/**", "/v2/api-docs", "/webjars/**", "/doc.html", "/swagger-resources",
             "/webjars/springfox-swagger-ui/**"
         )
         private val IGNORE_HEADER = mutableSetOf(
@@ -33,7 +33,7 @@ class LogUtils {
         private val urlResponseMatcher: PathMatcher = PathMatcher(IGNORE_URL_SET)
 
         fun canLog(url: String): Boolean {
-            return !urlMatcher.ignore(url)
+            return !urlMatcher.match(url)
         }
 
         fun containsMethod(method: String): Boolean {
