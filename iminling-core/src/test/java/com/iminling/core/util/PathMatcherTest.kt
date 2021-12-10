@@ -13,12 +13,12 @@ internal class PathMatcherTest {
     fun urlTest() {
         var mutableListOf = mutableSetOf("/index")
         var pathMatcher = PathMatcher(mutableListOf)
-        var ignore = pathMatcher.ignore("xxxx.jpg")
-        assert(ignore)
-        ignore = pathMatcher.ignore("/myIndex")
-        assert(!ignore)
-        ignore = pathMatcher.ignore("/index")
-        assert(ignore)
+        var match = pathMatcher.match("xxxx.jpg")
+        assert(match)
+        match = pathMatcher.match("/myIndex")
+        assert(!match)
+        match = pathMatcher.match("/index")
+        assert(match)
     }
 
 }

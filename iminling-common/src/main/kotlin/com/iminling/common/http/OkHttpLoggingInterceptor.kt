@@ -50,8 +50,8 @@ class OkHttpLoggingInterceptor : Interceptor {
             source?.request(Long.MAX_VALUE)
             var buffer = source?.buffer
             var res = buffer?.clone()?.readUtf8()
-            var headers = response?.headers?.toMultimap()
-            headers = headers?.filter { !ignoreHeaders.contains(it.key.lowercase()) }
+            var respHeaders = response?.headers?.toMultimap()
+            respHeaders = respHeaders?.filter { !ignoreHeaders.contains(it.key.lowercase()) }
             log.info(
                 "OKHTTP_1,  url:{}, method:{}, status:{}, times:{}, response:{}, error:{}, headers:{}",
                 url,
@@ -60,7 +60,7 @@ class OkHttpLoggingInterceptor : Interceptor {
                 end - start,
                 res?.replace("\n", ""),
                 exception?.message,
-                headers
+                respHeaders
             )
         }
     }

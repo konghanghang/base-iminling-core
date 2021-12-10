@@ -85,4 +85,9 @@ class SwaggerAutoConfiguration {
         )
     }
 
+    @Bean
+    fun customizeModelPropertyBuilderPlugin(): CustomizeModelPropertyBuilderPlugin {
+        return CustomizeModelPropertyBuilderPlugin()
+    }
+
 }
