@@ -83,4 +83,10 @@ class CustomizeMybatisConfig(var mybatisPlusProperties: MybatisPlusProperties): 
         return MybatisMapperRefresh(resources.toTypedArray(), sqlSessionFactory, interval)
     }
 
+    @Bean
+    @ConditionalOnProperty(prefix = "mybatis", name = ["sql.log"], havingValue = "true", matchIfMissing = true)
+    fun sqlInterceptor(): SqlInterceptor {
+        return SqlInterceptor()
+    }
+
 }
