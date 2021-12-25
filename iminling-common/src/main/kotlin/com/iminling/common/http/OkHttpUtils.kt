@@ -53,8 +53,8 @@ class OkHttpUtils {
             var keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
             keyManagerFactory.init(keyStore, passwordChar)
 
-            var sslContext = SSLContext.getInstance("TLSv1")
-            sslContext.init(keyManagerFactory.keyManagers, trustManagerFactory.trustManagers, SecureRandom())
+            var sslContext = SSLContext.getInstance("TLS")
+            sslContext.init(keyManagerFactory.keyManagers, null, SecureRandom())
             return okHttpClientBuilder().sslSocketFactory(sslContext.socketFactory,
                 trustManagerFactory.trustManagers[0] as X509TrustManager
             )
