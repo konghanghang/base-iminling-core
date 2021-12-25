@@ -1,6 +1,7 @@
 package com.iminling.core.config.rest
 
 import com.iminling.common.http.OkHttpUtils
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.http.client.OkHttp3ClientHttpRequestFactory
 
@@ -8,6 +9,7 @@ import org.springframework.http.client.OkHttp3ClientHttpRequestFactory
  * @author  yslao@outlook.com
  * @since  2021/11/10
  */
+@Disabled
 internal class EnhanceRestTemplateTest {
 
     @Test

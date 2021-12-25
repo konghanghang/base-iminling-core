@@ -5,6 +5,7 @@ import okhttp3.Request
 import okhttp3.Response
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
 
@@ -12,6 +13,7 @@ import java.io.File
  * @author yslao@outlook.com
  * @since 2021/11/7
  */
+@Disabled("禁用")
 internal class OkHttpUtilsTest {
 
     private lateinit var httpClient: OkHttpClient

@@ -18,23 +18,14 @@ import com.iminling.core.config.rest.RestTemplateErrorHandler
 import com.iminling.core.config.rest.TextPlainHttpMessageConverter
 import com.iminling.core.config.swagger.SwaggerAutoConfiguration
 import com.iminling.core.config.value.GlobalReturnValueHandler
-import com.iminling.core.properties.Knife4jApiInfoProperties
-import io.swagger.annotations.ApiOperation
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.http.client.OkHttp3ClientHttpRequestFactory
-import org.springframework.http.converter.HttpMessageConverter
+import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import org.springframework.web.client.RestTemplate
-import springfox.documentation.builders.ApiInfoBuilder
-import springfox.documentation.builders.PathSelectors
-import springfox.documentation.builders.RequestHandlerSelectors
-import springfox.documentation.service.Contact
-import springfox.documentation.spi.DocumentationType
-import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc
 
 
@@ -140,8 +131,17 @@ class CoreBeanAutoConfiguration {
         //interceptors.add(RestTemplateLoggingInterceptor())
         restTemplate.errorHandler = RestTemplateErrorHandler()
         val messageConverters = restTemplate.messageConverters
-        messageConverters.removeIf { converter: HttpMessageConverter<*>? -> converter is MappingJackson2HttpMessageConverter }
-        messageConverters.add(mappingJackson2HttpMessageConverter)
+        // messageConverters.removeIf { converter: HttpMessageConverter<*>? -> converter is MappingJackson2HttpMessageConverter }
+        var listIterator = messageConverters.listIterator()
+        while (listIterator.hasNext()) {
+            var next = listIterator.next()
+            if (next is MappingJackson2HttpMessageConverter) {
+                listIterator.set(mappingJackson2HttpMessageConverter)
+            }
+            if (next is StringHttpMessageConverter) {
+                next.defaultCharset = Charsets.UTF_8
+            }
+        }
         messageConverters.add(TextPlainHttpMessageConverter(JsonUtil.getInstant()))
         return restTemplate
     }
