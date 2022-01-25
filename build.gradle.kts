@@ -67,7 +67,7 @@ subprojects {
     }
 
     group = "com.iminling"
-    version = "2.2.2"
+    version = "2.2.3-SNAPSHOT"
 
     dependencies {
         api(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
