@@ -1,10 +1,13 @@
 package com.iminling.common.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.iminling.common.json.model.Group;
 import com.iminling.common.json.model.Student;
 import com.iminling.common.json.model.Teacher;
+import java.lang.reflect.Type;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -66,5 +69,18 @@ class JsonUtilTest {
         map.put("KONG", "hh<hh");
         map.put("HANG", "hhhh222");
         System.out.println(JsonUtil.obj2Str(map));
+    }
+
+    @Test
+    void str2ObjTypeTest() {
+        String teacherStr = "{\"name\": \"xiaoming\", \"gender\": \"man\"}";
+        TypeReference typeReference = new TypeReference<Teacher>() {
+        };
+        Teacher teacher = JsonUtil.str2Obj(teacherStr, typeReference);
+        Assertions.assertTrue(teacher.getGender().equals("man"));
+        Assertions.assertFalse(teacher.getGender().equals("woman"));
+        Type type = typeReference.getType();
+        teacher = JsonUtil.str2Obj(teacherStr, type);
+        Assertions.assertTrue(teacher.getName().equals("xiaoming"));
     }
 }

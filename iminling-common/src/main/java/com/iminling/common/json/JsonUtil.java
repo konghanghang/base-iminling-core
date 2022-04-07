@@ -3,6 +3,7 @@ package com.iminling.common.json;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -204,6 +205,39 @@ public class JsonUtil {
         JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructParametricType(collectionClass,elementClasses);
         try {
             return OBJECT_MAPPER.readValue(str,javaType);
+        } catch (Exception e) {
+            LOGGER.warn("Parse String to Object error",e);
+            return null;
+        }
+    }
+
+    /**
+     * 字符串转为对应Type
+     * @param str
+     * @param type
+     * @param <T>
+     * @return type对应对象
+     */
+    public static <T> T str2Obj(String str, Type type){
+        JavaType javaType = OBJECT_MAPPER.getTypeFactory().constructType(type);
+        try {
+            return OBJECT_MAPPER.readValue(str,javaType);
+        } catch (Exception e) {
+            LOGGER.warn("Parse String to Object error",e);
+            return null;
+        }
+    }
+
+    /**
+     * 字符串转为对应TypeReference
+     * @param str
+     * @param typeReference
+     * @param <T>
+     * @return TypeReference对应对象
+     */
+    public static <T> T str2Obj(String str, TypeReference typeReference){
+        try {
+            return (T) OBJECT_MAPPER.readValue(str, typeReference);
         } catch (Exception e) {
             LOGGER.warn("Parse String to Object error",e);
             return null;
