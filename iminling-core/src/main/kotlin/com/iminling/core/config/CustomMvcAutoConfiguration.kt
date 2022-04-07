@@ -30,6 +30,8 @@ class CustomMvcAutoConfiguration(var globalInterceptor: GlobalInterceptor): WebM
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(globalInterceptor)
+                // 可以通过excludePathPatterns过滤掉某些路径
+            .excludePathPatterns("/swagger-ui.html")
     }
 
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
