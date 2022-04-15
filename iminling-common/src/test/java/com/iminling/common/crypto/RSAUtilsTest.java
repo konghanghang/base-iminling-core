@@ -2,6 +2,8 @@ package com.iminling.common.crypto;
 
 
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.jcajce.provider.asymmetric.RSA;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.security.KeyPair;
@@ -19,6 +21,22 @@ public class RSAUtilsTest {
         String privateKey = new String(Base64.encodeBase64(keyPair.getPrivate().getEncoded()));
         System.out.println(publicKey);
         System.out.println(privateKey);
+    }
+
+    @Test
+    void signTest() {
+        System.out.println(RSAUtils.sign("aaaa", RSAUtils.DEFAULT_PRIVATE_KEY));
+    }
+
+    @Test
+    void checkTest() {
+        String data = "aaaa";
+        String sign = "ZevWSLCVLrTAn9znptUbXSckbDJ2lQ8W0npJ0zb5otZ7/n1/wVokLEfaedpL2m/wVxn50FFzsY6qmuGgQrrIM/u8FuuA/0DH7xnGlPsQuI6BPhZM+wxNpvqYLC+6KI/+kSVSZ7QehQqE+R8rowRLrqjv1QY3RX6F8BGF6tu4gxg=";
+        boolean check = RSAUtils.check(data, sign, RSAUtils.DEFAULT_PUBLIC_KEY);
+        Assertions.assertEquals(true, check);
+        data = "aaaaa";
+        check = RSAUtils.check(data, sign, RSAUtils.DEFAULT_PUBLIC_KEY);
+        Assertions.assertEquals(false, check);
     }
 
     @Test

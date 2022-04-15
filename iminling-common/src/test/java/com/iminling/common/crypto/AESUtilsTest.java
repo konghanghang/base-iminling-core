@@ -1,6 +1,7 @@
 package com.iminling.common.crypto;
 
 import java.util.Base64;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -8,6 +9,16 @@ import org.junit.jupiter.api.Test;
  * @since 2021/2/19
  */
 public class AESUtilsTest {
+
+    @Test
+    void generateECBKeyTest() {
+        String s = AESUtils.Companion.generateECBKey();
+        Assertions.assertEquals(24, s.length());
+        s = AESUtils.Companion.generateECBKey(192);
+        Assertions.assertEquals(32, s.length());
+        s = AESUtils.Companion.generateECBKey(256);
+        Assertions.assertEquals(44, s.length());
+    }
 
     @Test
     void encryptECB() {
