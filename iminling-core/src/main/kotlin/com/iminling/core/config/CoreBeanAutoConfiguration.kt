@@ -138,6 +138,7 @@ class CoreBeanAutoConfiguration {
             if (next is MappingJackson2HttpMessageConverter) {
                 listIterator.set(mappingJackson2HttpMessageConverter)
             }
+            // 使用utf8编码防止请求乱码，不更改StringHttpMessageConverter位置，放在xmlConverter的前边防止string被xml解析
             if (next is StringHttpMessageConverter) {
                 next.defaultCharset = Charsets.UTF_8
             }
