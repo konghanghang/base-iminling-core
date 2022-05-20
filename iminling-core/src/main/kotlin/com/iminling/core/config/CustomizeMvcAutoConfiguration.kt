@@ -19,14 +19,13 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.io.IOException
 import java.lang.reflect.Type
-import java.nio.charset.Charset
 
 /**
  * @author  yslao@outlook.com
  * @since  2021/11/26
  */
 // @EnableWebMvc
-class CustomMvcAutoConfiguration(var globalInterceptor: GlobalInterceptor): WebMvcConfigurer {
+class CustomizeMvcAutoConfiguration(var globalInterceptor: GlobalInterceptor): WebMvcConfigurer {
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(globalInterceptor)
