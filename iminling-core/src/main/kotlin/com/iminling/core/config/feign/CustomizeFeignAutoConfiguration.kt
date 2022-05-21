@@ -1,6 +1,9 @@
 package com.iminling.core.config.feign
 
+import com.iminling.common.http.OkHttpUtils.Companion.okHttpClientBuilder
+import com.iminling.core.config.feign.client.CustomizeFeignClient
 import com.iminling.core.config.feign.decode.ResponseDecoder
+import feign.Client
 import feign.Feign
 import feign.codec.Decoder
 import org.springframework.beans.factory.ObjectFactory
@@ -9,7 +12,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations
+import org.springframework.cloud.netflix.ribbon.SpringClientFactory
 import org.springframework.cloud.openfeign.FeignClient
+import org.springframework.cloud.openfeign.ribbon.CachingSpringLoadBalancerFactory
+import org.springframework.cloud.openfeign.ribbon.LoadBalancerFeignClient
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder
 import org.springframework.cloud.openfeign.support.SpringDecoder
 import org.springframework.context.annotation.Bean
@@ -28,11 +34,23 @@ class CustomizeFeignAutoConfiguration(
     ) {
 
     /**
+     * 使用自定义的feignClient发起http请求
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    fun feignClient(cachingFactory: CachingSpringLoadBalancerFactory, clientFactory: SpringClientFactory): Client {
+        val okHttpClient = okHttpClientBuilder()
+            .retryOnConnectionFailure(false).build()
+        val feignOkHttpClient = CustomizeFeignClient(okHttpClient)
+        return LoadBalancerFeignClient(feignOkHttpClient, cachingFactory, clientFactory)
+    }
+
+    /**
      * 自定义feign解码，主要是处理 ResultModel 类型
      */
     @Bean
     @ConditionalOnMissingBean
-    fun feignDecoder(): Decoder? {
+    fun feignDecoder(): Decoder {
         return ResponseEntityDecoder(ResponseDecoder(SpringDecoder(messageConverters)))
     }
 
