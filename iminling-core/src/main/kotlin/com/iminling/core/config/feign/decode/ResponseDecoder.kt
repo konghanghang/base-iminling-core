@@ -29,7 +29,7 @@ class ResponseDecoder: Decoder {
             rawType = type.rawType
         }
         // 判断返回类型是否是ResultModel，如果是直接返回
-        if (ResultModel.javaClass.isAssignableFrom(rawType.javaClass)) {
+        if (ResultModel::class.java.isAssignableFrom(rawType.javaClass)) {
             return delegate.decode(response, type)
         }
         if (response.body() == null) return null

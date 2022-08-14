@@ -1,21 +1,18 @@
 package com.iminling.core.config.feign
 
 import com.iminling.common.http.OkHttpUtils.Companion.okHttpClientBuilder
-import com.iminling.core.config.feign.client.CustomizeFeignClient
 import com.iminling.core.config.feign.decode.ResponseDecoder
 import feign.Client
 import feign.Feign
 import feign.codec.Decoder
+import feign.okhttp.OkHttpClient
 import org.springframework.beans.factory.ObjectFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations
-import org.springframework.cloud.netflix.ribbon.SpringClientFactory
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.cloud.openfeign.ribbon.CachingSpringLoadBalancerFactory
-import org.springframework.cloud.openfeign.ribbon.LoadBalancerFeignClient
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder
 import org.springframework.cloud.openfeign.support.SpringDecoder
 import org.springframework.context.annotation.Bean
@@ -38,11 +35,11 @@ class CustomizeFeignAutoConfiguration(
      */
     @Bean
     @ConditionalOnMissingBean
-    fun feignClient(cachingFactory: CachingSpringLoadBalancerFactory, clientFactory: SpringClientFactory): Client {
+    fun feignClient(): Client {
         val okHttpClient = okHttpClientBuilder()
             .retryOnConnectionFailure(false).build()
-        val feignOkHttpClient = CustomizeFeignClient(okHttpClient)
-        return LoadBalancerFeignClient(feignOkHttpClient, cachingFactory, clientFactory)
+        // val feignOkHttpClient = CustomizeFeignClient(okHttpClient)
+        return OkHttpClient(okHttpClient)
     }
 
     /**

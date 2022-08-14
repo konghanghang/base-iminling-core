@@ -1,9 +1,7 @@
-import org.jetbrains.kotlin.gradle.plugin.statistics.ReportStatisticsToElasticSearch.password
-import org.jetbrains.kotlin.gradle.plugin.statistics.ReportStatisticsToElasticSearch.url
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.math.sign
 
 plugins {
     // https://docs.spring.io/spring-boot/docs/current/gradle-plugin/reference/htmlsingle/#introduction
@@ -12,8 +10,8 @@ plugins {
     // id("io.spring.dependency-management") version "1.0.11.RELEASE"
     // https://docs.gradle.org/6.0/userguide/java_plugin.html
     // java
-    kotlin("jvm") version "1.5.30"
-    kotlin("plugin.spring") version "1.5.30"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.spring") version "1.6.21"
     id("com.gorylenko.gradle-git-properties") version "2.2.2"
     // 解决kotlin无法识别java使用lombok的@getter等方法 https://kotlinlang.org/docs/lombok.html#gradle
     kotlin("plugin.lombok") version "1.5.30"
@@ -67,12 +65,12 @@ subprojects {
     }
 
     group = "com.iminling"
-    version = "2.2.3-SNAPSHOT"
+    version = "2022.0.8-SNAPSHOT"
 
     dependencies {
-        api(platform("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE"))
-        api(platform("org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR9"))
-        api(platform("com.alibaba.cloud:spring-cloud-alibaba-dependencies:2.1.0.RELEASE"))
+        api(platform("org.springframework.boot:spring-boot-dependencies:2.6.7"))
+        api(platform("org.springframework.cloud:spring-cloud-dependencies:2021.0.3"))
+        // api(platform("com.alibaba.cloud:spring-cloud-alibaba-dependencies:2.2.3.RELEASE"))
         api(platform("org.jetbrains.kotlin:kotlin-bom"))
         compileOnly("org.projectlombok:lombok:1.16.20")
         annotationProcessor("org.projectlombok:lombok:1.16.20")
