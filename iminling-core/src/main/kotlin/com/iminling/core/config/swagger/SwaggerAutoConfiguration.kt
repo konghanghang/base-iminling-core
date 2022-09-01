@@ -4,6 +4,7 @@ import com.fasterxml.classmate.TypeResolver
 import com.iminling.core.properties.Knife4jApiInfoProperties
 import io.swagger.annotations.ApiOperation
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import springfox.documentation.builders.ApiInfoBuilder
@@ -22,6 +23,7 @@ import springfox.documentation.spring.web.plugins.DocumentationPluginsManager
  * @since  2021/12/8
  */
 @EnableConfigurationProperties(Knife4jApiInfoProperties::class)
+@ConditionalOnProperty(prefix = "knife4j.info", name = ["enable"], havingValue = "true")
 class SwaggerAutoConfiguration {
 
     /**

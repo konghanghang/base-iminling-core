@@ -4,6 +4,8 @@ dependencies {
     // compileOnly("com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery")
     // compileOnly("com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-config")
     compileOnly("org.springframework.cloud:spring-cloud-starter-openfeign")
+    compileOnly("org.springframework.cloud:spring-cloud-starter-bootstrap")
+    compileOnly("org.springframework.cloud:spring-cloud-loadbalancer")
     compileOnly("org.springframework.boot:spring-boot-starter-data-jpa")
     compileOnly("com.querydsl:querydsl-jpa")
     // annotationProcessor("org.springframework.boot:spring-boot-starter-actuator")
@@ -11,6 +13,6 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-aop")
     api("io.github.openfeign:feign-okhttp")
     api("org.hibernate.validator:hibernate-validator:6.1.6.Final")
-    api("com.github.xiaoymin:knife4j-spring-boot-starter:2.0.7")
+    compileOnly("com.github.xiaoymin:knife4j-spring-boot-starter:2.0.7")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.3")
 }
