@@ -222,9 +222,9 @@ public class JsonUtil {
 
     /**
      * 字符串转为对应Type
-     * @param str
-     * @param type
-     * @param <T>
+     * @param str 字符串
+     * @param type  type
+     * @param <T> 泛型
      * @return type对应对象
      */
     public static <T> T str2Obj(String str, Type type){
@@ -239,9 +239,9 @@ public class JsonUtil {
 
     /**
      * 字符串转为对应TypeReference
-     * @param str
-     * @param typeReference
-     * @param <T>
+     * @param str 字符串
+     * @param typeReference typeReference
+     * @param <T> 泛型
      * @return TypeReference对应对象
      */
     public static <T> T str2Obj(String str, TypeReference typeReference){

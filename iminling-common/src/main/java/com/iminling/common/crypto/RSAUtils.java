@@ -51,7 +51,7 @@ public class RSAUtils {
      * 签名
      * @param data          待签名数据
      * @param privateKey    私钥
-     * @return
+     * @return String
      */
     public static String sign(String data, String privateKey) {
         try {
@@ -73,6 +73,7 @@ public class RSAUtils {
      * @param data   内容
      * @param sign      签名
      * @param publicKey 公钥
+     * @return boolean
      */
     public static boolean check(String data, String sign, String publicKey) {
         try {
