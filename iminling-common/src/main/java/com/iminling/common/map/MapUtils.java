@@ -15,7 +15,6 @@ public class MapUtils {
     public static Map<String, Object> objToMap(Object obj) throws IllegalAccessException {
         Map<String, Object> map = new LinkedHashMap<>();
         Class<?> clazz = obj.getClass();
-        System.out.println(clazz);
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
             String fieldName = field.getName();

@@ -8,6 +8,7 @@ import com.iminling.core.config.argument.DefaultRequestDataReader
 import com.iminling.core.config.argument.GlobalArgumentBeanPostProcessor
 import com.iminling.core.config.argument.GlobalArgumentResolverConfig
 import com.iminling.core.config.exception.GlobalExceptionHandler
+import com.iminling.core.config.exception.GlobalSpringErrorHandlerConfig
 import com.iminling.core.config.filter.AuthFilter
 import com.iminling.core.config.filter.Filter
 import com.iminling.core.config.filter.LoginFilter
@@ -34,7 +35,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc
  * @since 2021/2/19
  */
 @EnableSwagger2WebMvc
-@Import(CustomizeMybatisConfig::class, CustomizeJpaConfiguration::class, SwaggerAutoConfiguration::class)
+@Import(
+    CustomizeMybatisConfig::class,
+    CustomizeJpaConfiguration::class,
+    SwaggerAutoConfiguration::class,
+    GlobalSpringErrorHandlerConfig::class
+)
 class CoreBeanAutoConfiguration {
 
     /*@Bean
@@ -121,8 +127,10 @@ class CoreBeanAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(RestTemplate::class)
-    fun restTemplate(environment: ConfigurableEnvironment,
-                     mappingJackson2HttpMessageConverter: MappingJackson2HttpMessageConverter): RestTemplate {
+    fun restTemplate(
+        environment: ConfigurableEnvironment,
+        mappingJackson2HttpMessageConverter: MappingJackson2HttpMessageConverter
+    ): RestTemplate {
         val okHttp3ClientHttpRequestFactory = OkHttp3ClientHttpRequestFactory(OkHttpUtils.okHttpClientBuilder().build())
         var enable = environment.getProperty(ApplicationConstant.KEY_REST_TIMEOUT, "false")
         var restTemplate = EnhanceRestTemplate(enable.toBoolean())
