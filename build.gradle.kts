@@ -12,9 +12,10 @@ plugins {
     // java
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
-    id("com.gorylenko.gradle-git-properties") version "2.2.2"
+    id("com.gorylenko.gradle-git-properties") version "2.4.0"
     // 解决kotlin无法识别java使用lombok的@getter等方法 https://kotlinlang.org/docs/lombok.html#gradle
-    kotlin("plugin.lombok") version "1.5.30"
+    // kotlin("plugin.lombok") version "1.5.30"
+    kotlin("kapt") version "1.6.21"
     `java-library`
     `maven-publish`
     signing
@@ -36,46 +37,37 @@ configurations {
 }*/
 
 allprojects {
-
     repositories {
+        mavenLocal()
         maven {
             setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
         }
         mavenCentral()
     }
-
-    /*dependencyManagement {
-        imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:2.3.5.RELEASE")
-        }
-        dependencies {
-            dependency("org.projectlombok:lombok:1.16.20")
-        }
-    }*/
-
 }
 
 subprojects {
     apply {
-        // plugin("io.spring.dependency-management")
         plugin("org.jetbrains.kotlin.plugin.spring")
         plugin("org.jetbrains.kotlin.jvm")
         plugin("java-library")
-        plugin("org.jetbrains.kotlin.plugin.lombok")
     }
+
+    extra["lombokVersion"] = "1.18.24"
+    extra["gradleVersion"] = "7.5.1"
 
     group = "com.iminling"
     version = "2022.0.8-SNAPSHOT"
 
     dependencies {
-        api(platform("org.springframework.boot:spring-boot-dependencies:2.6.7"))
+        api(platform("org.springframework.boot:spring-boot-dependencies:2.6.13"))
         api(platform("org.springframework.cloud:spring-cloud-dependencies:2021.0.3"))
         // api(platform("com.alibaba.cloud:spring-cloud-alibaba-dependencies:2.2.3.RELEASE"))
         api(platform("org.jetbrains.kotlin:kotlin-bom"))
-        compileOnly("org.projectlombok:lombok:1.16.20")
-        annotationProcessor("org.projectlombok:lombok:1.16.20")
-        testCompileOnly("org.projectlombok:lombok:1.16.20")
-        testAnnotationProcessor("org.projectlombok:lombok:1.16.20")
+        compileOnly("org.projectlombok:lombok:${project.ext["lombokVersion"]}")
+        annotationProcessor("org.projectlombok:lombok:${project.ext["lombokVersion"]}")
+        testCompileOnly("org.projectlombok:lombok:${project.ext["lombokVersion"]}")
+        testAnnotationProcessor("org.projectlombok:lombok:${project.ext["lombokVersion"]}")
     }
 
     tasks.withType<Test> {
@@ -85,7 +77,7 @@ subprojects {
     tasks.jar {
         dependsOn(tasks.withType(GenerateMavenPom::class))
         manifest {
-            attributes("Created-By" to "Gradle 7.1")
+            attributes("Created-By" to "Gradle ${project.ext["gradleVersion"]}")
         }
         into("META-INF") {
             from("$buildDir/publications/mavenJava")
@@ -102,7 +94,7 @@ subprojects {
         kotlinOptions {
             // -Xjvm-default=all 接口默认方法
             freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
-            jvmTarget = "1.8"
+            jvmTarget = "17"
         }
     }
 }
@@ -132,8 +124,8 @@ subprojects {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         withJavadocJar()
         withSourcesJar()
     }

@@ -9,7 +9,6 @@ import feign.okhttp.OkHttpClient
 import org.springframework.beans.factory.ObjectFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient
@@ -27,8 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * @author yslao@outlook.com
  * @since 2022/5/20
  */
-@ConditionalOnClass(Feign::class)
-@ConditionalOnProperty(prefix = "app.customize", name = ["feign"], havingValue = "true", matchIfMissing = true)
+@ConditionalOnClass(Feign::class, LoadBalancerClient::class)
 class CustomizeFeignAutoConfiguration(
     private val messageConverters: ObjectFactory<HttpMessageConverters?>
     ) {

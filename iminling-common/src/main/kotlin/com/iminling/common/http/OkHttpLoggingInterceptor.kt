@@ -16,7 +16,7 @@ class OkHttpLoggingInterceptor : Interceptor {
     private val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     // header全部转成小写进行比较
-    var ignoreHeaders = setOf(
+    private var ignoreHeaders = setOf(
         "user-agent", "cookie", "accept", "sec-fetch-dest", "accept-language",
         "cache-control", "sec-fetch-mode", "connection", "accept-encoding", "upgrade-insecure-requests",
         "sec-fetch-site", "sec-fetch-user"
