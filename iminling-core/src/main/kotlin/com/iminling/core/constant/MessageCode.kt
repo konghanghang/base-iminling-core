@@ -33,6 +33,7 @@ enum class MessageCode(open val code: Int, open val message: String) {
     /*用户模块开始*/
     USER_MODEL_BEGIN(1000, "用户模块错误码开始"),
     USER_NOT_ACTIVATION(1001, "用户还没有激活,请查看邮件激活用户."),
+    USER_INFO_ERROR(1002, "请检查用户名或密码"),
     USER_UNKNOWN_ACCOUNT(401, "未知账户"),
     USER_ERROR_PASSWORD(401, "错误的凭证,密码错误"),
     USER_ERROR_PASSWORD_MUCH(1004, "用户名或密码错误次数过多"),
