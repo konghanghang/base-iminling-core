@@ -71,7 +71,7 @@ class SqlInterceptor: Interceptor {
             for (parameterMapping in parameterMappings) {
                 val propertyName = parameterMapping.property
                 if (metaObject.hasGetter(propertyName)) {
-                    val obj: Any = metaObject.getValue(propertyName)
+                    val obj: Any? = metaObject.getValue(propertyName)
                     sb.append(obj).append(",")
                 } else if (boundSql.hasAdditionalParameter(propertyName)) {
                     // 该分支是动态sql
