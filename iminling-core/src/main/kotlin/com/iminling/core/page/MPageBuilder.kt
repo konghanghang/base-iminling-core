@@ -12,7 +12,7 @@ class MPageBuilder {
     companion object {
         fun <T> builder(page: IPage<T>): PageResp<T> {
             var pageResp = PageResp<T>()
-            pageResp.pageModel.pageNum = page.current
+            pageResp.pageModel.pageNo = page.current
             pageResp.pageModel.pages = page.pages
             pageResp.pageModel.pageSize = page.size
             pageResp.pageModel.total = page.total

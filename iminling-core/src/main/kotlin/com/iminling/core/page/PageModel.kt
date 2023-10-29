@@ -32,7 +32,7 @@ class PageModel {
      * 当前页码数
      */
     @ApiModelProperty(value = "当前页码数,默认为1", notes = "默认为1")
-    var pageNum: Long = 1
+    var pageNo: Long = 1
 
     /**
      * 获取offset, limit offset,pageSize
@@ -41,6 +41,6 @@ class PageModel {
     @ApiModelProperty(hidden = true)
     @JsonIgnore
     var offset: Long = 0
-        get() = (pageNum - 1) * pageSize
+        get() = (pageNo - 1) * pageSize
 
 }
