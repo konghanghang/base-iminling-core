@@ -1,113 +1,141 @@
 # base-iminling-core
 
-Java 公共工具和 Spring Boot 自动配置库。`3.x` 使用 Maven 和纯 Java 源码，最低支持 **Java 17**，面向 **Spring Boot 4.0.x**；旧版 `2.x` 的 Spring Boot 2 / Java 8 项目需要迁移后才能使用。
+Java 公共工具和 Spring Boot 自动配置库，提供 JSON/XML、HTTP、缓存、加解密工具，以及 MVC 参数解析、统一返回、异常处理、校验和业务过滤器扩展。MyBatis-Plus、Feign 按需接入。
 
-## 版本与构建
+## 版本要求
 
 | 项目 | 当前基线 |
 | --- | --- |
-| Java | 最低 17；使用较新 JDK 构建时仍以 `--release 17` 编译 |
-| Maven | Wrapper 固定 3.9.11；直接使用 Maven 时要求 3.9+ |
-| 本库 | `3.0.0-SNAPSHOT` |
+| 本库 | `3.0.0-SNAPSHOT`，尚未发布到 Maven 仓库 |
+| Java | 最低 17；编译目标固定为 `--release 17` |
 | Spring Boot / Spring Framework | 4.0.9 / 7.0.x |
-| Spring Cloud | 2025.1.4，与 Boot 4.0.9 配套 |
+| Spring Cloud | 接入 Feign 时使用 2025.1.4，与 Boot 4.0.9 配套 |
 | JSON | Jackson 3 |
+| Maven | Wrapper 固定 Maven 3.9.11；直接使用 Maven 时要求 3.9+ |
+
+`3.x` 为纯 Java 源码和 Maven 构建。OkHttp 会传递引入 Kotlin 标准库，消费项目不需要配置 Kotlin 编译。JPA/QueryDSL 和 Swagger/OpenAPI 集成已移除，旧项目请先阅读[迁移指南](docs/migration-java17.md)。
+
+## 选择模块
+
+| 模块 | 用途 | 是否自动配置 Spring Boot |
+| --- | --- | --- |
+| `iminling-common` | 日期、文件、JSON/XML、OkHttp、缓存、加解密和 ID 工具 | 否，按需调用工具类 |
+| `iminling-core` | MVC 参数与返回、异常、校验、请求日志、业务过滤器、定时任务错误通知；可选 MyBatis-Plus / Feign 集成 | 是，同时依赖 common |
+
+## 快速接入
+
+### 1. 安装当前版本
+
+在本仓库使用本机 JDK 17 构建并安装到本地 Maven 仓库：
 
 ```sh
 ./mvnw clean verify
 ./mvnw install
-# 用已安装的真实 JAR 验证独立的最小 Spring Boot 消费项目
-./mvnw -f integration-tests/consumer/pom.xml verify
 ```
 
-Windows 使用 `mvnw.cmd`。首次运行 Wrapper 需要下载 Maven 和依赖。构建只需要本机 JDK 17+，普通测试和打包不需要签名密钥、发布凭据、数据库或外部服务；数据库测试使用 H2。Telegram 发消息测试默认禁用。
+Windows 使用 `mvnw.cmd`。首次运行需要下载 Maven 和依赖，普通构建不需要签名或发布凭据。数据库测试使用 H2；Telegram 真实发送测试默认禁用。
 
-## 模块与引用
+### 2. 添加依赖
 
-- `iminling-common`：日期、文件、缓存、加解密、JSON/XML、OkHttp 等工具。
-- `iminling-core`：MVC 参数与统一返回、异常处理、过滤器、请求日志、参数校验，以及可选的 MyBatis-Plus 和 Feign 集成。
-
-本版本尚未发布，先在仓库运行 `./mvnw install`，再在消费项目引用：
+以下配置加入一个使用 Spring Boot 4.0.9 的消费项目。示例中的依赖版本目前需要先完成上面的本地安装。
 
 ```xml
-<dependency>
-    <groupId>com.iminling</groupId>
-    <artifactId>iminling-core</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
-</dependency>
+<properties>
+    <java.version>17</java.version>
+    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.parameters>true</maven.compiler.parameters>
+</properties>
+
+<dependencies>
+    <dependency>
+        <groupId>com.iminling</groupId>
+        <artifactId>iminling-core</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </dependency>
+</dependencies>
 ```
 
-只需要工具类时可单独引用 `iminling-common`。自动配置通过 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 加载，不需要扫描 `com.iminling` 包。
+只需要工具类时，将 `artifactId` 改为 `iminling-common`。core 通过 Spring Boot 的自动配置清单加载，无需扫描 `com.iminling` 包。参数名用于匹配 JSON 字段，因此消费项目必须保留 `-parameters`。
 
-源码和构建均不再使用 Kotlin 编译器、插件或 DSL。OkHttp 自身仍会传递引入 Kotlin 标准库，使用本库不需要配置 Kotlin 编译。
+### 3. 添加一个接口
 
-## 自定义参数与统一返回
-
-`@EnableResolve` 默认只包装返回值；使用 `ARGUMENTS` 只处理 JSON 参数，`ALL` 同时处理参数与返回值，`NONE` 关闭两者。
+下面是可直接放入消费项目的 `ExampleApplication.java`：
 
 ```java
-@PostMapping("/list")
-@EnableResolve(ResolveStrategy.ALL)
-public PageResp<Item> list(Condition condition, PageModel pageModel) {
-    // ...
+package example;
+
+import com.iminling.core.annotation.EnableResolve;
+import com.iminling.core.annotation.Validate;
+import com.iminling.core.constant.ResolveStrategy;
+import jakarta.validation.constraints.NotBlank;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class ExampleApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ExampleApplication.class, args);
+    }
+
+    public record Input(@NotBlank String name) {}
+    public record Greeting(String text, long id) {}
+
+    @PostMapping("/greetings")
+    @EnableResolve(ResolveStrategy.ALL)
+    @Validate
+    public Greeting greet(Input input) {
+        return new Greeting("Hello, " + input.name(), 1L);
+    }
 }
 ```
 
-对应 JSON 请求：
+启动消费项目后请求接口：
 
-```json
-{
-  "condition": {"name": "example"},
-  "pageModel": {"pageNum": 1, "pageSize": 10}
-}
+```sh
+curl -X POST http://localhost:8080/greetings \
+  -H 'Content-Type: application/json' \
+  -d '{"input":{"name":"Alice"}}'
 ```
 
-无需给上述参数添加 `@RequestBody`。编译消费项目时应启用 `-parameters`（Maven `maven.compiler.parameters=true`），参数名用于匹配 JSON 字段。`@PathVariable`、`@RequestHeader` 和 Servlet 请求/响应参数保留 Spring 的处理方式。
-
-统一返回结构：
+返回结构：
 
 ```json
-{"code": 200, "data": {}, "message": "请求成功"}
+{"code":200,"data":{"text":"Hello, Alice","id":"1"},"message":"请求成功"}
 ```
 
-已经返回 `ResultModel`、`ResponseEntity` 或流式响应的方法不重复包装。原有 JSON 约定保留：Long 输出为字符串，日期时间默认 `yyyy-MM-dd HH:mm:ss`；Jackson 3 的 mapper 不再支持原地修改，应通过 builder 定制。
+这里的 `input` 来自方法参数名，`id` 按本库 JSON 约定输出为字符串。完整的独立消费项目示例见 [integration-tests/consumer](integration-tests/consumer)。
 
-## 过滤器、日志和校验
+## 接入后需要了解的默认行为
 
-实现 `com.iminling.core.config.filter.LoginFilter` / `AuthFilter`，并注册为 Spring Bean。通过 `getOrder()` 控制顺序，`getAnnotation()` 是 Java 默认方法，可识别组合注解。`@LoginRequired` 标记登录要求，`@Authentication` 提供角色和权限信息，具体鉴权逻辑由业务过滤器实现。
+- core 自动注册请求日志、异常处理、校验切面、参数处理器，以及默认 JsonMapper、RestTemplate 和 MVC 配置。
+- 自定义参数解析和统一返回由 `@EnableResolve` 控制；默认策略只处理返回值。
+- 登录与权限注解提供标记，业务必须实现并注册 `LoginFilter` / `AuthFilter`，才能执行认证与授权。
+- 默认 JSON 将 Long 输出为字符串，日期时间格式为 `yyyy-MM-dd HH:mm:ss`。
+- 默认 MVC 配置忽略 `Accept` 请求头，以 JSON 作为默认响应类型，并注册允许任意 Origin、请求头和方法的 CORS 过滤器。
+- 参数校验和一般业务异常当前通常返回 HTTP 500；业务 `code` 与 HTTP 状态码需要分别处理。
 
-- `filters.login=disable` / `filters.auth=disable`：关闭对应类型的业务过滤器，默认启用。
-- `ThreadContext` 保存当前请求的 `ClientInfo`、用户和属性，请求结束后清理。
-- HTTP 请求/响应日志由 `CustomizeGlobalFilter` 记录，排除静态资源等路径。
-- 在 Controller 方法上添加 `@Validate`，配合 `jakarta.validation` 注解和 `com.iminling.core.validation.group` 中的分组执行校验。
+具体生效条件和覆盖方式见[配置参考](docs/configuration.md)。
 
-定时任务错误处理仍支持 `errorHandler.enable`、`error.notice.user` 和自定义 `SendNoticeService`；已有业务 `TaskScheduler` 时不会覆盖它。
+## 文档导航
 
-## 可选组件
-
-这些组件在本库 POM 中标记为 `optional`，不会自动传播到消费项目。业务按需引入并配置；没有这些组件时，基础 MVC 自动配置仍可启动。
-
-| 能力 | 业务项目需要的依赖 |
+| 文档 | 内容 |
 | --- | --- |
-| MyBatis-Plus | `com.baomidou:mybatis-plus-spring-boot4-starter:3.5.16` 和 `mybatis-plus-jsqlparser:3.5.16` |
-| Feign 与负载均衡 | `spring-cloud-starter-openfeign`、`spring-cloud-starter-loadbalancer` 和 `io.github.openfeign:feign-okhttp`；导入 Spring Cloud 2025.1.4 BOM |
-| Nacos | 在消费项目按目标版本引入相应组件和 BOM；本库不再固定旧 Spring Cloud Alibaba BOM |
+| [功能与用法](docs/usage.md) | 参数与返回、异常、过滤器、校验、日志、请求上下文、工具类和通知扩展 |
+| [配置参考](docs/configuration.md) | 配置项、默认值、生效条件、自动配置 Bean 和当前限制 |
+| [可选集成](docs/integrations.md) | MyBatis-Plus、分页和 Feign 的完整接入方式 |
+| [2.x → 3.x 迁移指南](docs/migration-java17.md) | JDK、框架、Java 调用、JSON API 和已移除能力的迁移步骤 |
 
-MyBatis-Plus 集成包括分页、`createTime` / `updateTime` 填充、Map 键的下划线转驼峰，以及默认开启的 SQL 日志（`mybatis.sql.log=false` 关闭）。XML 热加载默认关闭，可在开发环境设置 `mybatis-plus.refresh-mapper=true` 和 `mybatis-plus.refresh-mapper-interval=5`（秒，必须大于 0）；该功能依赖 MyBatis 内部结构，升级 MyBatis 后需要重新验证。
+## 验证与发布准备
 
-Feign 使用 Spring Cloud LoadBalancer 替代 Ribbon；自定义 Client 与 Decoder 默认启用，设置 `app.customize.feign=false` 可关闭。声明返回 `ResultModel<T>` 时保留完整结构，声明返回 `T` 时提取响应的 `data`；普通 JSON 响应交回标准 Decoder。`@FeignClient` 接口不会被当作 MVC Controller 注册。
+```sh
+./mvnw clean verify
+./mvnw install
+./mvnw -f integration-tests/consumer/pom.xml clean verify
+```
 
-## 从 2.x 迁移
+最后一条命令使用已安装的真实 JAR 启动独立消费项目，检查 HTTP 调用和可选依赖缺席时的自动配置。普通构建生成 JAR、POM、源码包、Javadoc 包和 `git.properties`。
 
-1. 消费项目升级到 Java 17+ 和匹配的 Spring Boot / Spring Cloud 版本。
-2. 将 Servlet、Validation 的 `javax.*` 引用改为对应 `jakarta.*`。JDK 自带的 `javax.crypto`、`javax.net.ssl`、`javax.imageio` 等保持不变。
-3. Java 调用工具类时直接使用静态方法，例如 `AESUtils.encryptECB(...)`，删除旧的 `.Companion`；Java 加解密方法声明的受检异常需要捕获或透传。
-4. 直接使用 JSON API 的代码从 Jackson 2 的 core/databind 包迁到 `tools.jackson.*`；通用 Jackson 注解仍是 `com.fasterxml.jackson.annotation.*`。
-5. JPA/QueryDSL 和 Swagger/OpenAPI 集成已移除；有这些需求的消费项目自行配置。按需重新引入本库仍支持的可选组件。
-6. 这是新的大版本，不保证旧二进制兼容；旧调用方需要重新编译并验证。
-
-## 发布准备
-
-普通构建会生成 JAR、POM、源码包、Javadoc 包和 `git.properties`。`central` profile 提供 GPG 签名与 Central Publishing Portal 插件，替代已经淘汰的 OSSRH staging 配置。
-
-正式发布前需要设置正式版本、准备 GPG 密钥和 Maven settings 中 id 为 `central` 的发布凭据，再显式运行发布命令。`autoPublish=false`；本次迁移不执行远程发布，也没有验证远程凭据和仓库权限。
+正式发布使用显式启用的 `central` profile：发布前需要正式版本号、GPG 密钥，以及 Maven settings 中 id 为 `central` 的凭据。该 profile 的 `autoPublish=false`，远程发布权限与凭据尚未验证。Git 提交的 SSH 签名和 Maven 制品的 GPG 签名分别配置。

@@ -1,42 +1,131 @@
-# Java 17 / Maven 迁移记录
+# 从 2.x 迁移到 3.x
 
-基线：`master` / `9f2cb7d`。用户确认最低支持 Java 17，源码迁为纯 Java，构建迁回 Maven，Spring Boot 升级大版本。
+[返回 README](../README.md) · [功能与用法](usage.md) · [配置参考](configuration.md) · [可选集成](integrations.md)
 
-## 目标
+本指南面向引用旧版 `com.iminling` 公共库的项目。3.x 是新的兼容性基线，需要重新编译和接入验证，不保证与旧版二进制兼容。
 
-- 新库版本 `3.0.0-SNAPSHOT`，编译 `release=17`，保留 common / core 两模块。
-- Spring Boot 4.0.9 / Spring Cloud 2025.1.4（Cloud BOM 对应的 Boot 版本）。
-- Kotlin 源码与测试转 Java；移除 Gradle 和 Kotlin 编译配置。
-- Jakarta、Jackson 3、Spring Cloud LoadBalancer 与新版 MyBatis-Plus 适配；按用户后续要求移除 JPA/QueryDSL 和 Swagger/OpenAPI。
-- 验证统一返回、自定义参数、过滤器、自动配置和可选集成，文档说明旧版调用方的迁移点。
+## 1. 确认目标运行环境
 
-## 状态
+| 项目 | 3.x 基线 |
+| --- | --- |
+| Java | 最低 17，编译目标 17 |
+| Spring Boot / Spring Framework | 4.0.9 / 7.0.x |
+| Spring Cloud | 使用 Feign 时配套 2025.1.4 |
+| JSON | Jackson 3 |
+| 本库版本 | `3.0.0-SNAPSHOT` |
+| 构建 | Maven 3.9.11（通过 Wrapper），移除 Gradle |
 
-已完成本地实施与验证，提交状态以 Git 记录为准；尚未推送或发布。用户补充要求：只用本机 JDK 17 验证，不再下载或安装其他 JDK。后续确认去掉 JPA 和 Swagger，其自动配置、依赖、辅助类、扩展及专用测试均已移除。
+Spring Boot 2 / Java 8 项目不能只替换公共库版本。先确定业务应用的框架升级范围，再替换依赖。需要维持旧运行环境时继续使用旧版库。
 
-## 实际实现
+本仓库的 Kotlin 源码和测试已转为 Java，消费项目无需 Kotlin 编译配置；OkHttp 传递引入的 Kotlin 标准库仍存在，不等同于运行时依赖完全没有 Kotlin。
 
-- 根 POM 和两个子模块统一到 `3.0.0-SNAPSHOT`，Maven Wrapper 固定 3.9.11，Enforcer 要求 Java 17+ / Maven 3.9+，编译目标 17。
-- 保留能力的 Kotlin 主源码与测试已迁为 Java；移除 Gradle 文件和旧 `spring.factories` 自动配置注册。
-- 使用 Jakarta 与 Jackson 3；保留 JSON 日期格式和 Long 字符串约定，适配 Java 17 的反射访问限制。
-- 使用 Spring Cloud LoadBalancer 和受支持的 Feign OkHttp adapter；MyBatis-Plus / Feign 保持可选。
-- Spring 7 的 RestTemplate 接口与请求工厂已适配；XML mapper 热加载经过真实查询验证，后台任务随 Bean 关闭。
-- 普通构建不要求签名；Central 签名与发布配置放入显式启用的 `central` profile。远程发布尚未执行、未验证。
-- JPA/QueryDSL（含 JPageBuilder）、Swagger/OpenAPI（含注解、Knife4j 元信息、UI、定制 schema）已移除，清理相应版本属性和 MVC 路径例外。
-- README 说明新基线、调用方迁移点和可选依赖。OkHttp 自身仍会传递引入 Kotlin 标准库；项目源码和编译配置不使用 Kotlin。
+## 2. 本地安装并替换依赖
 
-## 验证与审查
+当前版本尚未发布到 Maven 仓库，先在本仓库构建并安装：
 
-针对 `9f2cb7d` 之上的本次迁移全部变更（含新增文件），使用本机 Homebrew OpenJDK 17.0.13 和 Maven Wrapper 3.9.11。依赖缓存及验证用 settings 位于 `/private/tmp/iminling-migration`，没有更改系统 Maven / JDK 配置。
+```sh
+./mvnw clean verify
+./mvnw install
+```
 
-- `clean verify` 成功：common 26 个测试通过；core 9 个通过、1 个外部 Telegram 发送测试禁用。共 35 个通过、1 个跳过。
-- 覆盖 JSON/XML、AES、MVC 嵌套参数及路径/请求头、统一返回、校验、鉴权失败、请求上下文清理、Feign 解包、RestTemplate 本地 HTTP、H2 + MyBatis mapper 重载、可选依赖缺席。
-- 安装到临时本地仓库后，`integration-tests/consumer` 的独立消费测试通过：真实 JAR、真实 HTTP 和自动配置，确认类路径没有 JPA、QueryDSL、springdoc、Swagger，也没有可选的 MyBatis / Feign。
-- 两模块全部 class 主版本为 61；JAR 内含 Maven POM、`git.properties`，core 含新版自动配置清单；源码包和 Javadoc 包均已生成；无 Kotlin 源码或 module 元数据；JAR 与自动配置清单无 JPA/Swagger 遗留。
-- `git diff --check` 通过；核对旧 Kotlin 类的 Java 替代、依赖传播、自动配置注册和已识别关键路径。
+在消费项目更新公共库版本，并启用方法参数名：
 
-未覆盖真实 Nacos、远程服务发现、生产数据库及 Maven Central 发布权限；不将本地测试视为这些外部环境已经验收。
+```xml
+<properties>
+    <java.version>17</java.version>
+    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.parameters>true</maven.compiler.parameters>
+</properties>
 
-## 验收入口
+<dependencies>
+    <dependency>
+        <groupId>com.iminling</groupId>
+        <artifactId>iminling-core</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+```
 
-`./mvnw clean verify`；检查 JAR / POM / 源码包 / 文档包和 class 主版本 61；下游最小 Spring Boot 应用验证自动配置、MVC，核对已移除组件缺席和无可选依赖时启动行为。
+仅使用工具类的项目可以引用 `iminling-common`。业务项目不需要改成与本库相同的构建工具，但应配置等价的 Java 版本和 `-parameters`。
+
+自动配置入口已改用 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`，本库不再通过旧 spring.factories 注册这组自动配置。正常的 Spring Boot 应用不需要为此扫描 `com.iminling`。
+
+## 3. 更新 Java 与 JSON API 调用
+
+### Java 静态方法
+
+旧版 Java 调用中的 `.Companion` 改为静态方法调用，例如 `AESUtils.Companion.encryptECB(...)` 改为 `AESUtils.encryptECB(...)`。AES 相关方法声明 GeneralSecurityException，需要在调用处捕获或透传；证书 HTTP 方法还可能声明 IOException。
+
+过滤器接口的 getAnnotation 是 Java 默认方法，业务实现无需补写。可变模型仍通过 Java getter / setter 访问；不要把此次迁移理解为所有模型均已改成不可变 record。
+
+### Jakarta 包名
+
+| 旧 API | 新 API |
+| --- | --- |
+| `javax.servlet.*` | `jakarta.servlet.*` |
+| `javax.validation.*` | `jakarta.validation.*` |
+
+JDK 自带的 `javax.crypto`、`javax.net.ssl`、`javax.imageio` 保持原包名。`org.hibernate.validator.*` 属于仍在使用的校验实现，不是本库继续集成了 JPA / Hibernate ORM。
+
+### Jackson 3
+
+| 旧 API | 3.x 中的 API |
+| --- | --- |
+| `com.fasterxml.jackson.core.*` | `tools.jackson.core.*` |
+| `com.fasterxml.jackson.databind.*` | `tools.jackson.databind.*` |
+| `com.fasterxml.jackson.dataformat.*` | `tools.jackson.dataformat.*` |
+| 通用 Jackson 注解 | 仍为 `com.fasterxml.jackson.annotation.*` |
+
+Jackson 3 还更改了部分类型，例如 ValueSerializer、ValueDeserializer、SerializationContext；不要仅批量替换包名前缀。Java 时间支持已集成，不再照搬旧版的 jsr310 module 配置。
+
+JsonUtil.getInstant() 现在返回 JsonMapper；JsonUtil 的 TypeReference 重载使用 Jackson 3 类型。定制 mapper 使用 builder，见[配置参考](configuration.md#定制-jsonmapper)。
+
+保留的默认 JSON 协议包括 Long 转字符串和固定日期时间格式。迁移业务应用后，仍需检查自定义 JsonMapper、消息转换器、前端类型和 Feign 返回类型是否遵守同一约定。
+
+## 4. 调整可选组件与已移除能力
+
+### MyBatis-Plus 与 Feign
+
+这些依赖是 optional，需由消费项目显式声明，完整片段见[可选集成](integrations.md)。
+
+- MyBatis-Plus 使用 Boot 4 starter 和单独的 jsqlparser 模块，默认分页为 MySQL。
+- Feign 使用 Spring Cloud LoadBalancer 替代 Ribbon，依赖 OpenFeign、LoadBalancer 和 feign-okhttp。
+- 本库不再固定旧 Spring Cloud Alibaba BOM，也没有 Nacos 专用自动配置，业务按目标兼容版本接入服务发现。
+- 自定义 Client、Decoder、MybatisPlusInterceptor 或 MetaObjectHandler 时，应检查默认 Bean 是否退让，以及业务实现是否保留所需能力。
+
+### JPA / QueryDSL
+
+本库已移除 JPA 自动配置、QueryDSL 依赖、JPageBuilder，以及相应测试和注册项。原先依赖本库提供 JPAQueryFactory 或分页构建的代码，需要在业务项目自行实现，或改用仍保留的 MyBatis-Plus 分页。
+
+### Swagger / OpenAPI
+
+本库已移除 Swagger/OpenAPI 依赖、UI、文档生成扩展、SwaggerDisplayEnum 注解和 Knife4jApiInfoProperties。旧的 `knife4j.info.*` 配置不再由本库读取，也不再提供文档端点。
+
+需要 API 文档的业务项目自行引入兼容目标 Spring Boot 的文档组件和注解；原来自定义多参数 JSON、返回包装和枚举展示的文档扩展不会自动恢复。
+
+本次删除作用于当前版本，没有改写 Git 历史或清除旧提交中的文件。
+
+## 5. 检查接入行为
+
+按实际使用的能力验证：
+
+- `@EnableResolve` 的策略、嵌套 JSON 参数名、空值及 Optional；消费项目已启用 `-parameters`。
+- 统一返回的结构、Long 字符串、日期格式；ResponseEntity、流式响应和直接 ResultModel 的处理方式。
+- HTTP 状态码与业务 code；参数校验、BizException 当前通常使用 HTTP 500。
+- 业务 LoginFilter / AuthFilter 的注册、注解判断、组内顺序和请求上下文。路径排除同时跳过本库 MVC 拦截器，见[日志说明](usage.md#日志与路径排除)。
+- core 默认 CORS、内容协商和消息转换设置与业务原有 MVC 配置是否一致，见[配置参考](configuration.md#默认-web-行为)。
+- MyBatis 真实查询、分页、填充和现有 customizer；Feign 服务发现、返回解包、超时和业务失败码处理。
+
+`filters.log` 没有实现配置开关；按 URL 设置 RestTemplate 超时仍是固定 `/index` 规则。迁移时不要把旧常量或示例类当作已经外部化的配置能力。
+
+## 验证入口
+
+```sh
+./mvnw clean verify
+./mvnw install
+./mvnw -f integration-tests/consumer/pom.xml clean verify
+```
+
+仓库测试覆盖 JSON/XML、AES、MVC 参数与返回、校验、鉴权失败、请求上下文清理、Feign 解包、本地 HTTP、H2 下的 MyBatis 查询和 mapper 重载。独立消费项目验证真实 JAR 的自动配置与 HTTP 行为，并断言 JPA、QueryDSL、Swagger/OpenAPI 不在类路径中。
+
+本地验证使用本机 JDK 17，不要求安装其他 JDK。真实注册中心、生产数据库、远端服务和 Maven Central 发布凭据需在相应环境验证；GitHub 上的代码推送不代表 Maven 制品已经发布。
