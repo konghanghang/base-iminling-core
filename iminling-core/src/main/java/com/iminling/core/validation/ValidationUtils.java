@@ -1,5 +1,7 @@
 package com.iminling.core.validation;
 
+import jakarta.validation.*;
+
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -9,13 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
-import javax.validation.*;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Set;
 
 /**
  * 校验工具
+ *
  * @author yslao@outlook.com
  */
 public class ValidationUtils {
@@ -24,21 +26,32 @@ public class ValidationUtils {
 
     private static final String MSG_DEFAULT_CONTENT = "参数校验不通过";
 
-    private static final ResourceBundleMessageInterpolator INTERPOLATOR = new ResourceBundleMessageInterpolator();
+    private static final ResourceBundleMessageInterpolator INTERPOLATOR =
+            new ResourceBundleMessageInterpolator();
 
-    private static ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
+    private static ParameterNameDiscoverer parameterNameDiscoverer =
+            new DefaultParameterNameDiscoverer();
 
-    private static Validator validator = Validation.byDefaultProvider().configure().messageInterpolator(new MessageInterpolator() {
-        @Override
-        public String interpolate(String s, Context context) {
-            return INTERPOLATOR.interpolate(s, context, Locale.SIMPLIFIED_CHINESE);
-        }
+    private static Validator validator =
+            Validation.byDefaultProvider()
+                    .configure()
+                    .messageInterpolator(
+                            new MessageInterpolator() {
+                                @Override
+                                public String interpolate(String s, Context context) {
+                                    return INTERPOLATOR.interpolate(
+                                            s, context, Locale.SIMPLIFIED_CHINESE);
+                                }
 
-        @Override
-        public String interpolate(String s, Context context, Locale locale) {
-            return INTERPOLATOR.interpolate(s, context, Locale.SIMPLIFIED_CHINESE);
-        }
-    }).buildValidatorFactory().getValidator();
+                                @Override
+                                public String interpolate(
+                                        String s, Context context, Locale locale) {
+                                    return INTERPOLATOR.interpolate(
+                                            s, context, Locale.SIMPLIFIED_CHINESE);
+                                }
+                            })
+                    .buildValidatorFactory()
+                    .getValidator();
 
     static Validator getValidator() {
         return validator;
@@ -66,7 +79,8 @@ public class ValidationUtils {
         }
     }
 
-    private static String messageWrapper(ConstraintViolation<?> constraintViolation, Method method) {
+    private static String messageWrapper(
+            ConstraintViolation<?> constraintViolation, Method method) {
         ConstraintViolationImpl<?> violation = (ConstraintViolationImpl<?>) constraintViolation;
         try {
             PathImpl path = (PathImpl) violation.getPropertyPath();
@@ -88,5 +102,4 @@ public class ValidationUtils {
         }
         return constraintViolation.getMessage();
     }
-
 }

@@ -1,0 +1,4 @@
+com.iminling.core.config.CoreBeanAutoConfiguration
+com.iminling.core.config.CustomizeMvcAutoConfiguration
+com.iminling.core.config.feign.CustomizeFeignAutoConfiguration
+com.iminling.core.config.mybatis.CustomizeMybatisConfig

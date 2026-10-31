@@ -1,10 +1,11 @@
 package com.iminling.common.id.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.iminling.common.id.jackson.IdHashJsonDeserializerFactory;
 import com.iminling.common.id.jackson.IdHashJsonSerializerFactory;
+
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,5 +23,4 @@ import java.lang.annotation.Target;
 @JsonSerialize(using = IdHashJsonSerializerFactory.class)
 // 指定反序列化
 @JsonDeserialize(using = IdHashJsonDeserializerFactory.class)
-public @interface IdHash {
-}
+public @interface IdHash {}

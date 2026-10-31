@@ -1,21 +1,23 @@
 package com.iminling.core.validation;
 
 import com.iminling.core.annotation.Validate;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
+import jakarta.validation.executable.ExecutableValidator;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.context.annotation.Configuration;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.executable.ExecutableValidator;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-
 /**
  * 参数校验切面
+ *
  * @author yslao@outlook.com
  */
 @Aspect
@@ -36,7 +38,8 @@ public class ValidationInterceptor {
             // 获取分组信息
             Class<?>[] groups = annotation.value();
             // 1.先校验方法上的规则
-            Set<ConstraintViolation<Object>> validateResults = EXECUTABLE_VALIDATOR.validateParameters(point.getTarget(), method, args);
+            Set<ConstraintViolation<Object>> validateResults =
+                    EXECUTABLE_VALIDATOR.validateParameters(point.getTarget(), method, args);
             ValidationUtils.operateValidateResult(method, validateResults);
 
             // 2. 循环校验每个方法参数bean内部
@@ -48,5 +51,4 @@ public class ValidationInterceptor {
             }
         }
     }
-
 }

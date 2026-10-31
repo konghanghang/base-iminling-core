@@ -1,10 +1,11 @@
 package com.iminling.common.json.model;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import tools.jackson.dataformat.xml.annotation.JacksonXmlCData;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 @Data
 @Accessors(chain = true)
@@ -12,10 +13,9 @@ import lombok.experimental.Accessors;
 public class Student {
 
     @JacksonXmlProperty(isAttribute = true, localName = "stu_id")
-    private String id;  //学号---属性
+    private String id; // 学号---属性
 
-    @JacksonXmlCData
-    private String name;
+    @JacksonXmlCData private String name;
 
     private String gender;
 

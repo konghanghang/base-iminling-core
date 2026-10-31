@@ -1,25 +1,23 @@
 package com.iminling.common.id.jackson;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.iminling.common.id.annotation.IdHash;
 import com.iminling.common.id.jackson.serialize.IdJsonSerializer;
 
-import java.io.IOException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.*;
 
 /**
  * @author yslao@outlook.com
  * @since 2020/11/13
  */
-public class IdHashJsonSerializerFactory extends JsonSerializer<Object> implements ContextualSerializer {
+public class IdHashJsonSerializerFactory extends ValueSerializer<Object> {
     @Override
-    public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(Object value, JsonGenerator gen, SerializationContext serializers) {
         System.out.println("------------");
     }
 
     @Override
-    public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) throws JsonMappingException {
+    public ValueSerializer<?> createContextual(SerializationContext prov, BeanProperty property) {
         IdHash annotation = property.getAnnotation(IdHash.class);
         JavaType type = property.getType();
         // string类型

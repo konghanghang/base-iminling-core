@@ -1,16 +1,18 @@
 package com.iminling.common.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.iminling.common.json.model.Group;
 import com.iminling.common.json.model.Student;
 import com.iminling.common.json.model.Teacher;
-import java.lang.reflect.Type;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.dataformat.xml.XmlMapper;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,7 @@ class JsonUtilTest {
     }
 
     @Test
-    void xml2Object() throws JsonProcessingException {
+    void xml2Object() throws JacksonException {
         Student student = new Student();
         student.setAge("20").setGender("男").setName("张>三").setId("100");
         String xml = xmlMapper.writeValueAsString(student);
@@ -37,7 +39,7 @@ class JsonUtilTest {
     }
 
     @Test
-    void  all() throws JsonProcessingException {
+    void all() throws JacksonException {
         Group group = new Group();
         group.setTeacher(new Teacher().setAge("55").setName("李四").setGender("男"));
         List<Student> list = new ArrayList<>();
@@ -50,7 +52,7 @@ class JsonUtilTest {
     }
 
     @Test
-    void testMap() throws JsonProcessingException {
+    void testMap() throws JacksonException {
         Map<String, Object> map = new HashMap<>();
         map.put("KONG", "hh<hh");
         map.put("HANG", "hhhh222");
@@ -74,8 +76,7 @@ class JsonUtilTest {
     @Test
     void str2ObjTypeTest() {
         String teacherStr = "{\"name\": \"xiaoming\", \"gender\": \"man\"}";
-        TypeReference typeReference = new TypeReference<Teacher>() {
-        };
+        TypeReference typeReference = new TypeReference<Teacher>() {};
         Teacher teacher = JsonUtil.str2Obj(teacherStr, typeReference);
         Assertions.assertTrue(teacher.getGender().equals("man"));
         Assertions.assertFalse(teacher.getGender().equals("woman"));
